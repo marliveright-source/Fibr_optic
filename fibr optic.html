@@ -1,0 +1,4785 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5" />
+<meta name="theme-color" content="#1e293b" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>سامانه گزارش‌گیری فیبر نوری</title>
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" /></noscript>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+<style>
+:root{
+  --bg: #f8fafc; --bg-alt: #f1f5f9; --surface: #ffffff; --surface-2: #f8fafc;
+  --line: #e2e8f0; --line-strong: #cbd5e1;
+  --text: #0f172a; --text-soft: #475569; --text-muted: #94a3b8;
+  --accent: #1e40af; --accent-soft: #dbeafe; --accent-deep: #1e3a8a;
+  --gold: #b45309; --gold-soft: #fef3c7;
+  --danger: #b91c1c; --danger-soft: #fee2e2;
+  --success: #15803d; --success-soft: #dcfce7;
+  --warning: #b45309; --warning-soft: #fef3c7;
+  --info: #0369a1; --info-soft: #e0f2fe;
+  --radius: 10px; --radius-sm: 8px; --radius-lg: 14px; --tap: 44px;
+  --shadow-xs: 0 1px 2px rgba(15,23,42,.04);
+  --shadow-sm: 0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
+  --shadow-md: 0 4px 12px -2px rgba(15,23,42,.08);
+}
+[data-theme="dark"]{
+  --bg: #0b1017; --bg-alt: #0f1620; --surface: #131b26; --surface-2: #18222f;
+  --line: #263143; --line-strong: #334155;
+  --text: #e2e8f0; --text-soft: #94a3b8; --text-muted: #64748b;
+  --accent: #60a5fa; --accent-soft: #1e3a5f; --accent-deep: #3b82f6;
+  --gold: #fbbf24; --gold-soft: #3f2c0d;
+  --danger: #f87171; --danger-soft: #3f1616;
+  --success: #4ade80; --success-soft: #14331e;
+  --warning: #fbbf24; --warning-soft: #3f2c0d;
+  --info: #38bdf8; --info-soft: #0f2a3d;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,.3);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.4);
+  --shadow-md: 0 4px 12px -2px rgba(0,0,0,.5);
+}
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  font-family:Vazirmatn, system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+  background:var(--bg); color:var(--text); font-size:14px; line-height:1.7; font-weight:450;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  -webkit-tap-highlight-color:transparent; overscroll-behavior-y:none;
+  transition:background .2s linear, color .2s linear; min-height:100vh;
+  overflow-x:hidden;
+}
+body.no-scroll{overflow:hidden;touch-action:none;}
+h1,h2,h3,h4,p{margin:0;}
+button{font-family:inherit;color:inherit;font-weight:inherit;}
+input,textarea,select{font-family:inherit;font-size:16px;}
+body, input, textarea, select { font-variant-numeric: tabular-nums; }
+
+.screen{display:none;min-height:100vh;flex-direction:column;}
+.screen.active{display:flex;}
+
+/* ====== LANDING ====== */
+#landing{
+  background:radial-gradient(700px 400px at 100% 0%, rgba(30,64,175,.06), transparent 60%), var(--bg);
+  min-height:100vh; display:flex; flex-direction:column;
+}
+.landing-top-bar{border-bottom:1px solid var(--line);background:var(--surface);}
+.landing-top-inner{
+  max-width:1100px;margin:0 auto;padding:12px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:nowrap;
+}
+.brand-line{display:flex;align-items:center;gap:10px;min-width:0;flex:1;}
+.brand-mark{
+  width:34px;height:34px;flex:0 0 auto;display:grid;place-items:center;
+  border-radius:8px;background:var(--accent);color:#fff;
+  font-size:13px;font-weight:800;letter-spacing:-0.5px;
+}
+.brand-text{min-width:0;}
+.brand-text b{
+  display:block;font-size:13px;font-weight:700;color:var(--text);
+  letter-spacing:-0.1px;line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.brand-text span{
+  display:block;font-size:10px;color:var(--text-muted);
+  font-weight:500;letter-spacing:0.3px;margin-top:1px;
+}
+.top-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto;}
+.chip-status{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 11px;border-radius:999px;
+  font-size:11px;font-weight:600;
+  background:var(--success-soft);color:var(--success);
+  border:1px solid transparent;white-space:nowrap;
+}
+.chip-status::before{
+  content:"";width:6px;height:6px;border-radius:50%;background:var(--success);
+  box-shadow:0 0 0 3px rgba(21,128,61,.15);
+}
+
+.landing-main{
+  flex:1;max-width:1100px;width:100%;margin:0 auto;
+  padding:32px 16px 48px;
+}
+.hero-block{margin-bottom:28px;max-width:780px;}
+.hero-label{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:600;color:var(--text-soft);
+  letter-spacing:0.5px;text-transform:uppercase;margin-bottom:14px;
+  padding:6px 12px;background:var(--surface);
+  border:1px solid var(--line);border-radius:999px;
+}
+.hero-label::before{
+  content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);
+}
+.hero-title{
+  font-size:26px;font-weight:800;line-height:1.45;
+  letter-spacing:-0.5px;color:var(--text);margin-bottom:12px;
+}
+.hero-title .accent{color:var(--accent);}
+.hero-description{
+  font-size:13.5px;color:var(--text-soft);line-height:1.9;max-width:680px;
+}
+
+.dash-panel{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  padding:18px;
+  margin-bottom:28px;
+  box-shadow:var(--shadow-xs);
+  display:grid;
+  grid-template-columns:1fr;
+  gap:18px;
+}
+@media (min-width:820px){
+  .dash-panel{
+    grid-template-columns:1.05fr 1fr;
+    gap:24px;
+    padding:22px 24px;
+  }
+}
+.dash-side{display:flex;flex-direction:column;gap:16px;min-width:0;}
+.dash-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding-bottom:12px;border-bottom:1px solid var(--line);
+}
+.dash-head .dh-title{
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:800;color:var(--text);
+  letter-spacing:-0.1px;
+}
+.dash-head .dh-title::before{
+  content:"";width:7px;height:7px;border-radius:2px;background:var(--accent);
+}
+.dash-head .dh-meta{
+  font-size:11px;font-weight:600;color:var(--text-muted);
+  letter-spacing:0.3px;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.dash-head .dh-meta::before{
+  content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--success);
+  box-shadow:0 0 0 3px rgba(21,128,61,.15);
+}
+.dash-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line);
+  border-radius:var(--radius);overflow:hidden;
+}
+.dash-stat{
+  background:var(--surface);padding:12px 10px;
+  display:flex;flex-direction:column;gap:4px;min-width:0;
+}
+.dash-stat .ds-num{
+  font-size:22px;font-weight:800;color:var(--text);
+  line-height:1.05;letter-spacing:-0.6px;
+}
+.dash-stat .ds-num.accent{color:var(--accent);}
+.dash-stat .ds-num.gold{color:var(--gold);}
+.dash-stat .ds-num.ok{color:var(--success);}
+.dash-stat .ds-lbl{
+  font-size:10px;font-weight:600;color:var(--text-muted);
+  letter-spacing:0.3px;text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.dash-breakdown{display:flex;flex-direction:column;gap:10px;}
+.dash-breakdown-head{
+  font-size:11px;font-weight:700;color:var(--text-muted);
+  letter-spacing:0.4px;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.dash-breakdown-head .db-total{
+  font-size:10.5px;font-weight:700;
+  padding:2px 8px;border-radius:5px;
+  background:var(--surface-2);border:1px solid var(--line);
+  color:var(--text-soft);letter-spacing:0;text-transform:none;
+}
+.dash-bars{display:flex;flex-direction:column;gap:8px;}
+.dash-bar{
+  display:grid;grid-template-columns:64px 1fr 28px;
+  align-items:center;gap:8px;font-size:11px;font-weight:600;
+}
+.dash-bar .db-label{
+  color:var(--text-soft);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;
+}
+.dash-bar .db-track{
+  position:relative;height:6px;background:var(--surface-2);
+  border-radius:999px;overflow:hidden;
+}
+.dash-bar .db-fill{
+  position:absolute;inset:0 auto 0 0;
+  background:var(--accent);border-radius:999px;
+  transition:width .35s cubic-bezier(.32,.72,0,1);
+}
+.dash-bar.t1 .db-fill{background:#0369a1;}
+.dash-bar.t2 .db-fill{background:#6d28d9;}
+.dash-bar.t3 .db-fill{background:#15803d;}
+.dash-bar.t4 .db-fill{background:#b91c1c;}
+.dash-bar.t5 .db-fill{background:#b45309;}
+.dash-bar.tc .db-fill{background:#7e22ce;}
+.dash-bar .db-count{
+  color:var(--text);font-weight:800;text-align:left;
+  font-variant-numeric:tabular-nums;
+}
+.dash-empty{
+  font-size:11.5px;color:var(--text-muted);
+  padding:14px 12px;background:var(--surface-2);
+  border:1px dashed var(--line);border-radius:var(--radius-sm);
+  text-align:center;
+}
+.dash-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:auto;}
+.dash-primary{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;
+  background:linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+  color:#fff;border:none;border-radius:var(--radius);
+  cursor:pointer;font-family:inherit;text-align:right;
+  transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  touch-action:manipulation;
+  box-shadow:0 8px 22px -12px var(--accent);
+}
+.dash-primary:hover{filter:brightness(1.05);}
+.dash-primary:active{transform:scale(.985);}
+.dash-primary .dp-txt{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.dash-primary .dp-txt b{font-size:13.5px;font-weight:800;letter-spacing:-0.2px;}
+.dash-primary .dp-txt span{font-size:10.5px;font-weight:500;opacity:.85;}
+.dash-primary .dp-arrow{font-size:18px;font-weight:700;transition:transform .2s ease;flex:0 0 auto;}
+.dash-secondary-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.dash-secondary{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 12px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  cursor:pointer;font-family:inherit;text-align:right;
+  transition:border-color .12s ease, background .12s ease;
+  touch-action:manipulation;min-height:48px;
+}
+.dash-secondary:hover{border-color:var(--line-strong);background:var(--surface);}
+.dash-secondary:active{transform:scale(.99);}
+.dash-secondary .ds-ico{
+  width:28px;height:28px;flex:0 0 auto;
+  display:grid;place-items:center;border-radius:7px;
+  background:var(--accent-soft);color:var(--accent);font-size:13px;
+}
+.dash-secondary .ds-txt{flex:1;min-width:0;}
+.dash-secondary .ds-txt b{
+  display:block;font-size:12px;font-weight:700;color:var(--text);
+  letter-spacing:-0.1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.dash-secondary .ds-txt span{
+  display:block;font-size:10px;color:var(--text-muted);margin-top:1px;
+}
+.dash-side.right{gap:12px;}
+.dash-status{
+  display:flex;flex-direction:column;gap:10px;padding:14px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius);
+}
+.dash-status-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.dash-status-head b{font-size:12px;font-weight:800;color:var(--text);letter-spacing:-0.1px;}
+.dash-status-head span{font-size:10px;font-weight:600;color:var(--text-muted);letter-spacing:0.3px;}
+.dash-status-list{display:flex;flex-direction:column;gap:6px;}
+.dash-status-item{
+  display:flex;align-items:center;gap:10px;
+  font-size:11px;font-weight:600;color:var(--text-soft);
+}
+.dash-status-item .dsi-dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto;}
+.dash-status-item.ok .dsi-dot{background:var(--success);box-shadow:0 0 0 3px rgba(21,128,61,.15);}
+.dash-status-item.warn .dsi-dot{background:var(--gold);box-shadow:0 0 0 3px rgba(180,83,9,.15);}
+.dash-status-item.info .dsi-dot{background:var(--info);box-shadow:0 0 0 3px rgba(3,105,161,.15);}
+.dash-status-item .dsi-text{flex:1;}
+.dash-status-item .dsi-val{font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;}
+.dash-recent{display:flex;flex-direction:column;gap:8px;}
+.dash-recent-head{
+  font-size:11px;font-weight:700;color:var(--text-muted);
+  letter-spacing:0.4px;text-transform:uppercase;
+}
+.dash-recent-list{display:flex;flex-direction:column;gap:6px;}
+.dash-recent-item{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:9px 12px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  font-size:11px;min-width:0;
+}
+.dash-recent-item .dr-title{
+  font-weight:700;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;
+}
+.dash-recent-item .dr-badge{
+  font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:5px;
+  background:var(--accent-soft);color:var(--accent);flex:0 0 auto;
+}
+.dash-recent-empty{
+  font-size:11px;color:var(--text-muted);padding:12px;
+  text-align:center;border:1px dashed var(--line);
+  border-radius:var(--radius-sm);background:var(--surface-2);
+}
+
+.section-label{
+  font-size:11.5px;font-weight:700;color:var(--text-muted);
+  letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px;
+  display:flex;align-items:center;gap:10px;
+}
+.section-label::after{content:"";flex:1;height:1px;background:var(--line);}
+.modules-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+@media (min-width:720px){.modules-grid{grid-template-columns:1fr 1fr;}}
+.module-card{
+  position:relative;text-align:right;padding:20px;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius-lg);cursor:pointer;font-family:inherit;
+  display:flex;flex-direction:column;gap:14px;
+  transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+  touch-action:manipulation;box-shadow:var(--shadow-xs);min-height:200px;
+}
+.module-card:hover{border-color:var(--line-strong);box-shadow:var(--shadow-md);}
+.module-card:active{transform:scale(.995);}
+.module-card.featured{background:linear-gradient(180deg, var(--surface) 0%, var(--bg-alt) 100%);}
+.module-card.disabled{cursor:not-allowed;opacity:.7;}
+.module-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.module-icon{
+  width:42px;height:42px;flex:0 0 auto;display:grid;place-items:center;
+  border-radius:10px;background:var(--accent-soft);color:var(--accent);font-size:19px;
+}
+.module-card.featured .module-icon{background:var(--accent);color:#fff;}
+.module-card.disabled .module-icon{background:var(--line);color:var(--text-muted);}
+.module-badge{
+  font-size:10px;font-weight:700;padding:4px 9px;border-radius:6px;
+  background:var(--gold-soft);color:var(--gold);letter-spacing:0.3px;
+  text-transform:uppercase;
+}
+.module-badge.live{background:var(--success-soft);color:var(--success);}
+.module-body h3{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.2px;margin-bottom:6px;}
+.module-body p{font-size:12.5px;color:var(--text-soft);line-height:1.8;}
+.module-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-top:auto;padding-top:12px;border-top:1px solid var(--line);
+}
+.module-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.m-tag{
+  font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--text-soft);
+}
+.module-arrow{font-size:16px;color:var(--accent);font-weight:700;transition:transform .2s ease;}
+.module-card:hover:not(.disabled) .module-arrow{transform:translateX(-3px);}
+.landing-footer{border-top:1px solid var(--line);background:var(--surface);margin-top:32px;}
+.landing-footer-inner{
+  max-width:1100px;margin:0 auto;padding:16px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;font-size:11px;
+  color:var(--text-muted);font-weight:500;
+}
+.landing-footer b{color:var(--text-soft);font-weight:700;}
+
+/* ====== APP BAR ====== */
+.app-bar{
+  position:sticky;top:0;z-index:40;
+  background:var(--surface);
+  border-bottom:1px solid var(--line);
+}
+.app-bar-inner{
+  max-width:1000px;margin:0 auto;padding:10px 14px;
+  padding-top:calc(10px + env(safe-area-inset-top));
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.app-bar-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1;}
+.home-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px 6px 8px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;font-size:12px;font-weight:700;
+  color:var(--text-soft);cursor:pointer;font-family:inherit;
+  transition:background .15s ease, border-color .15s ease, color .15s ease, transform .1s ease;
+  touch-action:manipulation;letter-spacing:-0.1px;white-space:nowrap;flex:0 0 auto;
+}
+.home-btn:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
+.home-btn:active{transform:scale(.97);}
+.home-btn .hb-ico{
+  display:grid;place-items:center;width:22px;height:22px;
+  border-radius:50%;background:var(--accent);color:#fff;
+  font-size:11px;font-weight:800;flex:0 0 auto;
+}
+.home-btn:hover .hb-ico{background:var(--accent-deep);}
+.app-bar-title{min-width:0;padding-right:6px;border-right:1px solid var(--line);}
+.app-bar-title b{
+  display:block;font-size:13px;font-weight:800;color:var(--text);
+  letter-spacing:-0.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.app-bar-title span{
+  display:block;font-size:10px;color:var(--text-muted);font-weight:500;
+  letter-spacing:0.3px;margin-top:1px;
+}
+.app-bar-right{display:flex;align-items:center;gap:5px;flex:0 0 auto;}
+.icon-action{
+  width:34px;height:34px;display:grid;place-items:center;
+  background:transparent;border:1px solid var(--line);border-radius:8px;
+  font-size:13px;color:var(--text-soft);cursor:pointer;
+  transition:background .12s ease, border-color .12s ease;
+  touch-action:manipulation;flex:0 0 auto;
+}
+.icon-action:hover{background:var(--surface-2);}
+.icon-action:active{transform:scale(.95);}
+
+@media (max-width:520px){
+  .home-btn .hb-label{display:none;}
+  .home-btn{padding:6px 7px;}
+  .home-btn .hb-ico{width:24px;height:24px;font-size:12px;}
+  .app-bar-title{padding-right:4px;}
+  .app-bar-title b{font-size:12px;}
+  .app-bar-title span{font-size:9.5px;}
+}
+
+.wrap{max-width:1000px;margin:0 auto;padding:14px 12px 80px;}
+
+.panel{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius-lg);padding:14px;margin-bottom:12px;
+  box-shadow:var(--shadow-xs);
+}
+.panel-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line);
+}
+.panel-head h2{
+  font-size:12.5px;font-weight:800;color:var(--text);
+  letter-spacing:-0.1px;display:flex;align-items:center;gap:8px;
+}
+.panel-head h2 .dot{width:7px;height:7px;border-radius:2px;background:var(--accent);}
+.panel-head .panel-meta{font-size:10.5px;color:var(--text-muted);font-weight:600;}
+.form-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+@media (min-width:600px){
+  .form-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .form-grid.cols-2{grid-template-columns:repeat(2,1fr);}
+}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0;}
+.field-label{font-size:11px;font-weight:600;color:var(--text-soft);letter-spacing:0.2px;}
+
+.input, textarea, select{
+  width:100%;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius-sm);padding:10px 12px;min-height:var(--tap);
+  font-size:16px;color:var(--text);
+  transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  -webkit-appearance:none;appearance:none;
+  max-width:100%;
+}
+input::placeholder,textarea::placeholder{color:var(--text-muted);}
+.input:focus, textarea:focus, select:focus{
+  outline:none;border-color:var(--accent);background:var(--surface);
+  box-shadow:0 0 0 3px var(--accent-soft);
+}
+textarea{min-height:88px;resize:vertical;line-height:1.8;}
+select{cursor:pointer;background-image:none;}
+
+.date-row{display:flex;gap:8px;align-items:stretch;}
+.date-row .input{flex:1;min-width:0;}
+.date-row .btn-inline{
+  flex:0 0 auto;padding:10px 14px;min-height:var(--tap);
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius-sm);font-size:12.5px;font-weight:600;
+  color:var(--text-soft);cursor:pointer;touch-action:manipulation;
+}
+.date-row .btn-inline:hover{background:var(--bg-alt);}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 16px;min-height:var(--tap);border-radius:var(--radius-sm);
+  border:1px solid transparent;font-size:13.5px;font-weight:700;
+  cursor:pointer;letter-spacing:-0.1px;
+  -webkit-user-select:none;user-select:none;touch-action:manipulation;
+  background:var(--surface-2);color:var(--text);
+  transition:background .15s ease, border-color .15s ease, transform .1s ease;
+  -webkit-appearance:none;appearance:none;
+}
+.btn:hover{background:var(--bg-alt);}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-primary:hover{background:var(--accent-deep);border-color:var(--accent-deep);}
+.btn-ghost{background:transparent;border-color:var(--line);color:var(--text-soft);}
+.btn-ghost:hover{background:var(--surface-2);}
+.btn-danger{background:var(--danger-soft);color:var(--danger);border-color:transparent;}
+.btn-danger:hover{background:var(--danger);color:#fff;}
+.btn-block{width:100%;}
+.btn-sm{padding:7px 12px;min-height:36px;font-size:12.5px;border-radius:7px;}
+
+.stats-bar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+@media (min-width:600px){.stats-bar{grid-template-columns:auto auto 1fr auto;}}
+.stat-cell{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:10px 14px;
+  display:flex;flex-direction:column;gap:2px;min-width:0;
+  box-shadow:var(--shadow-xs);
+}
+.stat-cell .st-num{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-0.5px;line-height:1.1;}
+.stat-cell .st-lbl{font-size:10px;font-weight:600;color:var(--text-muted);letter-spacing:0.3px;text-transform:uppercase;}
+.stat-cell.accent .st-num{color:var(--accent);}
+
+.quick-bar{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;
+  box-shadow:var(--shadow-xs);
+}
+.quick-bar-head{
+  font-size:11px;font-weight:700;color:var(--text-muted);
+  letter-spacing:0.4px;text-transform:uppercase;margin-bottom:10px;
+}
+.quick-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 12px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:999px;
+  font-size:12px;font-weight:600;color:var(--text-soft);
+  cursor:pointer;font-family:inherit;
+  transition:background .12s ease, border-color .12s ease, color .12s ease;
+  touch-action:manipulation;min-height:32px;
+}
+.chip:hover{border-color:var(--line-strong);color:var(--text);}
+.chip .chip-count{
+  display:inline-block;min-width:18px;text-align:center;padding:0 4px;
+  font-size:10.5px;font-weight:700;color:var(--text-muted);
+  background:var(--bg-alt);border-radius:4px;line-height:1.6;
+}
+.chip.chip-all{background:var(--accent);border-color:var(--accent);color:#fff;}
+.chip.chip-all .chip-count{background:rgba(255,255,255,.22);color:#fff;}
+
+.filter-bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.filter-bar .input{flex:1 1 180px;min-width:0;min-height:42px;}
+.filter-bar select{flex:1 1 120px;min-width:0;min-height:42px;}
+
+.job-list{display:flex;flex-direction:column;gap:10px;}
+.job-card{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:12px 14px;
+  display:flex;flex-direction:column;gap:8px;
+  transition:border-color .15s ease, box-shadow .15s ease;
+  box-shadow:var(--shadow-xs);
+}
+.job-card:hover{border-color:var(--line-strong);}
+.job-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.job-card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.tag{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:10.5px;font-weight:700;padding:4px 9px;border-radius:6px;
+  background:var(--surface-2);color:var(--text-soft);
+  border:1px solid var(--line);letter-spacing:0.2px;
+}
+.tag-accent{background:var(--accent-soft);color:var(--accent);border-color:transparent;}
+.job-card-date{font-size:10.5px;color:var(--text-muted);font-weight:600;letter-spacing:0.2px;}
+.job-card-title{font-size:14.5px;font-weight:700;color:var(--text);letter-spacing:-0.2px;word-break:break-word;}
+.job-card-sub{font-size:12px;color:var(--text-soft);line-height:1.7;word-break:break-word;}
+.job-card-actions{display:flex;gap:8px;padding-top:8px;border-top:1px dashed var(--line);}
+.job-card-actions .btn{flex:1;}
+
+.empty-state{
+  text-align:center;padding:48px 16px;background:var(--surface);
+  border:1px dashed var(--line-strong);border-radius:var(--radius);color:var(--text-muted);
+}
+.empty-state .es-mark{
+  display:inline-grid;place-items:center;width:46px;height:46px;
+  border-radius:12px;background:var(--surface-2);font-size:20px;
+  color:var(--text-soft);margin-bottom:12px;
+}
+.empty-state p{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.empty-state p.muted{font-size:11.5px;color:var(--text-muted);font-weight:500;}
+
+.danger-panel{
+  margin-top:20px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius-lg);padding:14px;box-shadow:var(--shadow-xs);
+}
+.danger-panel .dp-head{
+  display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;
+  color:var(--danger);letter-spacing:-0.1px;margin-bottom:6px;
+}
+.danger-panel .dp-head .dp-dot{width:7px;height:7px;border-radius:2px;background:var(--danger);}
+.danger-panel p.dp-desc{font-size:11.5px;color:var(--text-soft);margin-bottom:12px;line-height:1.8;}
+.reset-list{display:flex;flex-direction:column;gap:8px;}
+.reset-item{
+  display:flex;align-items:center;gap:10px;padding:11px 12px;
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  background:var(--surface-2);cursor:pointer;font-family:inherit;text-align:right;
+  transition:border-color .12s ease, background .12s ease;touch-action:manipulation;
+}
+.reset-item:hover{border-color:var(--line-strong);background:var(--surface);}
+.reset-item .ri-ico{
+  width:30px;height:30px;flex:0 0 auto;display:grid;place-items:center;
+  border-radius:8px;font-size:13px;
+}
+.reset-item .ri-text{flex:1;min-width:0;text-align:right;}
+.reset-item .ri-text b{display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.reset-item .ri-text span{display:block;font-size:10.5px;color:var(--text-muted);line-height:1.6;}
+.reset-item.ri-warn .ri-ico{background:var(--warning-soft);color:var(--warning);}
+.reset-item.ri-danger .ri-ico{background:var(--danger-soft);color:var(--danger);}
+.reset-item.ri-strong{background:var(--danger);border-color:var(--danger);}
+.reset-item.ri-strong .ri-ico{background:rgba(255,255,255,.2);color:#fff;}
+.reset-item.ri-strong .ri-text b{color:#fff;}
+.reset-item.ri-strong .ri-text span{color:rgba(255,255,255,.75);}
+
+/* ====== SHEET ====== */
+.sheet-overlay{
+  position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;
+  justify-content:center;background:rgba(15,23,42,.55);opacity:0;
+  transition:opacity .2s ease-out;
+  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+}
+.sheet-overlay[hidden]{display:none;}
+.sheet-overlay.show{opacity:1;}
+.sheet{
+  width:100%;max-width:720px;max-height:92vh;display:flex;flex-direction:column;
+  background:var(--bg);border-radius:16px 16px 0 0;overflow:hidden;
+  transform:translateY(100%);
+  transition:transform .28s cubic-bezier(.32,.72,0,1);
+}
+.sheet-overlay.show .sheet{transform:translateY(0);}
+@media (min-width:760px){
+  .sheet-overlay{align-items:center;padding:24px;}
+  .sheet{border-radius:16px;max-height:88vh;transform:translateY(16px) scale(.98);}
+  .sheet-overlay.show .sheet{transform:none;}
+}
+.sheet-head{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--line);
+}
+.sheet-head h2{font-size:14px;font-weight:800;color:var(--text);letter-spacing:-0.2px;}
+.sheet-head .sheet-sub{display:block;font-size:10.5px;color:var(--text-muted);font-weight:500;margin-top:2px;}
+.close-x{
+  width:32px;height:32px;display:grid;place-items:center;
+  background:transparent;border:1px solid var(--line);border-radius:8px;
+  font-size:13px;color:var(--text-soft);cursor:pointer;
+  transition:background .12s ease;touch-action:manipulation;flex:0 0 auto;
+}
+.close-x:hover{background:var(--surface-2);}
+.sheet-body{flex:1 1 auto;overflow-y:auto;padding:14px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
+.sheet-foot{
+  flex:0 0 auto;display:flex;gap:8px;padding:12px 14px;
+  padding-bottom:calc(12px + env(safe-area-inset-bottom));
+  background:var(--surface);border-top:1px solid var(--line);
+}
+.sheet-foot .btn{flex:1;}
+
+.form-section{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:14px;margin-bottom:10px;
+}
+.form-section.is-hidden{display:none;}
+.form-section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line);
+}
+.form-section-head h3{
+  font-size:11.5px;font-weight:800;color:var(--text-soft);
+  letter-spacing:0.4px;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;
+}
+.form-section-head h3::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--accent);}
+.form-section-head .fs-meta{font-size:10px;color:var(--text-muted);font-weight:600;}
+.form-body{display:flex;flex-direction:column;gap:10px;}
+
+.type-selector{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+@media (min-width:520px){.type-selector{grid-template-columns:repeat(3,1fr);}}
+.type-item{
+  position:relative;display:flex;align-items:center;gap:10px;
+  padding:10px 12px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  cursor:pointer;font-family:inherit;text-align:right;
+  transition:background .12s ease, border-color .12s ease;
+  touch-action:manipulation;min-height:50px;
+}
+.type-item:hover{border-color:var(--line-strong);background:var(--surface);}
+.type-item .ti-name{font-size:12px;font-weight:700;color:var(--text);letter-spacing:-0.1px;line-height:1.3;}
+.type-item .ti-sub{font-size:10px;color:var(--text-muted);font-weight:500;margin-top:1px;}
+.type-item.active{background:var(--accent);border-color:var(--accent);}
+.type-item.active .ti-name{color:#fff;}
+.type-item.active .ti-sub{color:rgba(255,255,255,.8);}
+.type-remove{
+  position:absolute;top:6px;left:6px;width:20px;height:20px;
+  display:grid;place-items:center;border-radius:5px;
+  background:rgba(185,28,28,.9);color:#fff;font-size:11px;font-weight:800;
+  border:none;cursor:pointer;padding:0;line-height:1;
+}
+.type-add{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px;border:1px dashed var(--line-strong);
+  border-radius:var(--radius-sm);background:transparent;color:var(--text-soft);
+  font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;
+  grid-column:1 / -1;transition:border-color .12s ease, color .12s ease;
+  touch-action:manipulation;min-height:50px;
+}
+.type-add:hover{border-color:var(--accent);color:var(--accent);}
+
+.opts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+@media (min-width:520px){.opts-grid{grid-template-columns:repeat(3,1fr);}}
+
+.opt-item{
+  position:relative;display:flex;align-items:center;gap:8px;
+  padding:10px 12px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  cursor:pointer;font-family:inherit;text-align:right;
+  transition:background .12s ease, border-color .12s ease;
+  touch-action:manipulation;min-height:48px;width:100%;
+}
+.opt-item:hover{border-color:var(--line-strong);}
+.opt-item .oi-label{
+  flex:1;font-size:11.5px;font-weight:700;color:var(--text);
+  letter-spacing:-0.1px;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;text-align:right;line-height:1.3;min-width:0;
+}
+.opt-item .oi-switch{
+  width:34px;height:20px;flex:0 0 auto;position:relative;
+  border-radius:999px;background:var(--line-strong);
+  transition:background .15s ease;
+}
+.opt-item .oi-switch::after{
+  content:"";position:absolute;top:2px;right:2px;
+  width:16px;height:16px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 2px rgba(0,0,0,.2);
+  transition:transform .2s cubic-bezier(.32,.72,0,1);
+}
+.opt-item.active{background:var(--accent-soft);border-color:var(--accent);}
+.opt-item.active .oi-switch{background:var(--accent);}
+.opt-item.active .oi-switch::after{transform:translateX(-14px);}
+.opt-item .oi-remove{
+  width:22px;height:22px;flex:0 0 auto;display:none;place-items:center;
+  border-radius:50%;background:transparent;color:var(--text-muted);
+  font-size:12px;font-weight:800;line-height:1;border:none;cursor:pointer;
+  padding:0;margin-left:-4px;
+}
+.opt-item.is-custom .oi-remove{display:grid;}
+.opt-item .oi-remove:hover{background:var(--danger-soft);color:var(--danger);}
+.opts-add{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px;border:1px dashed var(--line-strong);
+  border-radius:var(--radius-sm);background:transparent;color:var(--text-soft);
+  font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;
+  grid-column:1 / -1;transition:border-color .12s ease, color .12s ease, background .12s ease;
+  touch-action:manipulation;min-height:48px;
+}
+.opts-add:hover{border-color:var(--accent);color:var(--accent);background:var(--surface);}
+
+.dyn-field{
+  display:flex;flex-direction:column;gap:6px;padding:10px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius-sm);
+}
+.dyn-field.is-on{background:var(--surface);border-color:var(--line-strong);}
+.dyn-field-label{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font-size:11px;font-weight:700;color:var(--text-soft);
+}
+.dyn-field-toggle{
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;
+  background:var(--line);color:var(--text-muted);letter-spacing:0.2px;
+}
+.dyn-field.is-on .dyn-field-toggle{background:var(--success-soft);color:var(--success);}
+.field-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+
+/* ====== تگ‌گذاری در فرم کار (فقط داخل فرم) ====== */
+.tag-form-block{
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius-sm);padding:12px;
+}
+.tag-form-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font-size:11.5px;font-weight:700;color:var(--text-soft);margin-bottom:10px;
+}
+.tag-form-head .tfh-current{
+  font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:5px;
+  background:var(--accent-soft);color:var(--accent);
+}
+.tag-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.tag-form-choice{
+  display:flex;align-items:center;gap:8px;padding:9px 10px;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius-sm);cursor:pointer;font-family:inherit;
+  text-align:right;font-size:11.5px;font-weight:700;color:var(--text);
+  transition:background .12s ease, border-color .12s ease;
+  touch-action:manipulation;min-height:44px;width:100%;
+}
+.tag-form-choice:hover{border-color:var(--line-strong);}
+.tag-form-choice .tfc-sw{
+  width:22px;height:22px;flex:0 0 auto;display:grid;place-items:center;
+  border-radius:6px;font-size:11px;color:#fff;font-weight:800;
+}
+.tag-form-choice .tfc-lbl{
+  flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.tag-form-choice .tfc-ck{
+  width:18px;height:18px;display:grid;place-items:center;
+  border-radius:50%;border:1.5px solid var(--line-strong);
+  font-size:10px;color:transparent;flex:0 0 auto;
+}
+.tag-form-choice.active{background:var(--accent-soft);border-color:var(--accent);}
+.tag-form-choice.active .tfc-ck{background:var(--accent);border-color:var(--accent);color:#fff;}
+.tag-form-choice[data-tag="done"] .tfc-sw{background:#15803d;}
+.tag-form-choice[data-tag="undone"] .tfc-sw{background:#b45309;}
+.tag-form-choice[data-tag="fusion"] .tfc-sw{background:#7e22ce;}
+.tag-form-choice[data-tag="admin"] .tfc-sw{background:#0369a1;}
+.tag-form-choice[data-tag="none"] .tfc-sw{background:#94a3b8;}
+
+/* ====== MODAL ====== */
+.modal-overlay{
+  position:fixed;inset:0;z-index:200;display:flex;align-items:center;
+  justify-content:center;background:rgba(15,23,42,.6);padding:16px;
+  opacity:0;transition:opacity .18s ease;
+  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+}
+.modal-overlay[hidden]{display:none;}
+.modal-overlay.show{opacity:1;}
+.modal-box{
+  background:var(--surface);border-radius:var(--radius-lg);
+  width:100%;max-width:420px;padding:20px;
+  box-shadow:0 20px 50px -12px rgba(15,23,42,.35);
+  transform:scale(.96);opacity:0;
+  transition:transform .2s cubic-bezier(.32,.72,0,1), opacity .18s ease;
+  text-align:center;
+  max-height:calc(100vh - 32px);overflow-y:auto;
+}
+.modal-overlay.show .modal-box{transform:none;opacity:1;}
+.modal-box h3{font-size:14.5px;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-0.2px;}
+.modal-box h3.danger{color:var(--danger);}
+.modal-box p.mb-desc{font-size:12px;color:var(--text-soft);line-height:1.8;margin-bottom:16px;}
+.modal-box .mb-actions{display:flex;flex-direction:column;gap:8px;}
+.modal-box .mb-actions .btn{width:100%;}
+.modal-box .mb-cancel{
+  margin-top:12px;padding:8px;background:transparent;border:none;
+  color:var(--text-muted);font-size:12px;font-weight:600;
+  cursor:pointer;width:100%;border-radius:7px;touch-action:manipulation;
+}
+.modal-box .mb-cancel:hover{background:var(--surface-2);}
+
+.group-picker{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:6px;margin-bottom:14px;text-align:right;
+}
+.group-picker .gp-item{
+  display:flex;align-items:center;gap:8px;padding:10px 12px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius-sm);cursor:pointer;font-family:inherit;
+  text-align:right;font-size:11.5px;font-weight:700;color:var(--text);
+  transition:background .12s ease, border-color .12s ease;
+  touch-action:manipulation;min-height:44px;width:100%;
+}
+.group-picker .gp-item:hover{border-color:var(--line-strong);}
+.group-picker .gp-item.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.group-picker .gp-item .gp-ico{
+  width:22px;height:22px;flex:0 0 auto;display:grid;place-items:center;
+  border-radius:6px;background:var(--accent-soft);color:var(--accent);
+  font-size:11px;font-weight:800;
+}
+.group-picker .gp-item.active .gp-ico{background:rgba(255,255,255,.22);color:#fff;}
+.group-picker .gp-item .gp-lbl{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.msgr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.msgr-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;padding:12px 6px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  cursor:pointer;font-family:inherit;
+  transition:border-color .12s ease, background .12s ease;touch-action:manipulation;
+}
+.msgr-btn:hover{border-color:var(--line-strong);background:var(--surface);}
+.msgr-btn .msgr-ico{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;color:#fff;}
+.msgr-btn .msgr-ico svg{width:18px;height:18px;display:block;}
+.msgr-btn .msgr-name{font-size:10.5px;font-weight:700;color:var(--text-soft);}
+.msgr-telegram .msgr-ico{background:#229ED9;}
+.msgr-eitaa .msgr-ico{background:#F97316;}
+.msgr-bale .msgr-ico{background:#22C55E;}
+.msgr-soroush .msgr-ico{background:#3B82F6;}
+.msgr-whatsapp .msgr-ico{background:#25D366;}
+.msgr-pinterest .msgr-ico{background:#E60023;}
+
+/* ====== EXPORT ====== */
+.export-summary{
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius);padding:12px;margin-bottom:10px;
+}
+.export-summary-head{
+  font-size:10.5px;font-weight:700;color:var(--text-muted);
+  letter-spacing:0.4px;text-transform:uppercase;margin-bottom:10px;
+}
+.scope-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.scope-chip{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 12px;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:999px;font-size:11px;font-weight:700;color:var(--text-soft);
+  cursor:pointer;font-family:inherit;transition:all .12s ease;touch-action:manipulation;
+}
+.scope-chip .sc-num{
+  font-size:10px;font-weight:700;padding:0 5px;min-width:18px;
+  text-align:center;background:var(--bg-alt);border-radius:4px;
+  line-height:1.6;color:var(--text-muted);
+}
+.scope-chip.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.scope-chip.active .sc-num{background:rgba(255,255,255,.22);color:#fff;}
+
+.meta-switch{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius);margin-bottom:10px;cursor:pointer;touch-action:manipulation;
+}
+.meta-switch .ms-switch{
+  width:34px;height:20px;position:relative;border-radius:999px;
+  background:var(--line-strong);flex:0 0 auto;transition:background .15s ease;
+}
+.meta-switch .ms-switch::after{
+  content:"";position:absolute;top:2px;right:2px;width:16px;height:16px;
+  border-radius:50%;background:#fff;
+  transition:transform .2s cubic-bezier(.32,.72,0,1);
+}
+.meta-switch .ms-label{font-size:12px;font-weight:700;color:var(--text);}
+.meta-switch input{display:none;}
+.meta-switch:has(input:checked) .ms-switch{background:var(--accent);}
+.meta-switch:has(input:checked) .ms-switch::after{transform:translateX(-14px);}
+
+.tabs{
+  display:flex;gap:4px;padding:4px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:10px;
+}
+.tab-btn{
+  flex:1;padding:9px 8px;border:none;background:transparent;
+  border-radius:6px;font-size:12px;font-weight:700;color:var(--text-soft);
+  cursor:pointer;font-family:inherit;
+  transition:background .12s ease, color .12s ease;touch-action:manipulation;
+}
+.tab-btn.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-xs);}
+
+.tab-panel[hidden]{display:none;}
+.export-textarea{
+  width:100%;min-height:min(58vh, 420px);background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px;
+  font-size:12.5px;line-height:2;direction:rtl;text-align:right;
+  white-space:pre-wrap;word-break:break-word;
+  font-family:'Vazirmatn', monospace;color:var(--text);resize:vertical;
+}
+
+.report-doc{
+  direction:rtl;background:#fff;color:#0f172a;border-radius:8px;
+  overflow:hidden;border:1px solid #e2e8f0;
+  font-family:Vazirmatn, system-ui, Tahoma, sans-serif;width:100%;
+}
+.doc-head{background:#1e3a8a;color:#fff;padding:18px 20px;position:relative;}
+.doc-head::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:#b45309;}
+.doc-head .doc-title{font-size:15px;font-weight:800;letter-spacing:-0.2px;margin-bottom:4px;}
+.doc-head .doc-sub{font-size:11px;opacity:.85;font-weight:500;}
+.doc-head .doc-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+.doc-head .doc-meta span{
+  display:inline-block;background:rgba(255,255,255,.15);
+  padding:4px 11px;border-radius:5px;font-size:10.5px;font-weight:600;
+}
+.doc-body{padding:18px 20px;background:#fff;}
+.doc-section-title{
+  font-size:11.5px;font-weight:800;color:#1e3a8a;letter-spacing:0.3px;
+  text-transform:uppercase;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.doc-section-title::before{content:"";width:4px;height:14px;background:#1e3a8a;border-radius:2px;}
+.doc-job{
+  border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;
+  margin-bottom:10px;background:#fafbfd;
+}
+.doc-job:last-child{margin-bottom:0;}
+.doc-job-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:9px 14px;background:#f1f5f9;border-bottom:1px solid #e2e8f0;
+}
+.doc-badge{
+  display:inline-block;font-size:10.5px;font-weight:800;
+  padding:3px 10px;border-radius:5px;background:#1e3a8a;color:#fff;
+  letter-spacing:0.2px;
+}
+.doc-badge.t1{background:#0369a1;}
+.doc-badge.t2{background:#6d28d9;}
+.doc-badge.t3{background:#15803d;}
+.doc-badge.t4{background:#b91c1c;}
+.doc-badge.t5{background:#b45309;}
+.doc-badge.tc{background:#7e22ce;}
+.doc-idx{font-size:10.5px;font-weight:700;color:#64748b;}
+.doc-job-body{padding:12px 14px;background:#fff;}
+.doc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 18px;}
+@media (max-width:520px){.doc-grid{grid-template-columns:1fr;}}
+.doc-row{display:flex;gap:6px;align-items:baseline;font-size:11.5px;line-height:1.8;min-width:0;}
+.doc-row.full{grid-column:1 / -1;}
+.doc-k{color:#64748b;font-weight:700;white-space:nowrap;flex:0 0 auto;}
+.doc-v{color:#0f172a;font-weight:600;word-break:break-word;}
+.doc-desc{
+  margin-top:10px;padding-top:10px;border-top:1px dashed #cbd5e1;
+  font-size:11.5px;line-height:1.8;color:#334155;word-break:break-word;
+}
+.doc-desc b{color:#475569;font-weight:800;}
+.doc-footer{
+  background:#f1f5f9;border-top:1px solid #e2e8f0;padding:12px 20px;
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+}
+.doc-footer span{
+  display:inline-block;background:#fff;color:#1e3a8a;
+  font-size:11px;font-weight:700;padding:6px 14px;border-radius:5px;
+  border:1px solid #e2e8f0;
+}
+.doc-brand{
+  text-align:center;font-size:10px;font-weight:700;color:#94a3b8;
+  padding:10px;letter-spacing:0.4px;background:#fff;
+}
+
+.toast-wrap{
+  position:fixed;left:0;right:0;bottom:24px;z-index:300;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:0 16px;pointer-events:none;
+}
+.toast{
+  background:#0f172a;color:#f1f5f9;padding:11px 18px;
+  border-radius:8px;font-size:12.5px;font-weight:600;
+  box-shadow:0 8px 24px rgba(15,23,42,.3);max-width:100%;
+  border:1px solid rgba(255,255,255,.1);
+  text-align:center;
+}
+[data-theme="dark"] .toast{background:#e2e8f0;color:#0f172a;}
+.toast.out{animation:toastOut .2s ease-out forwards;}
+@keyframes toastOut{to{opacity:0;transform:translateY(8px);}}
+
+.glass-footer{
+  position:fixed;bottom:10px;left:50%;transform:translateX(-50%);z-index:50;
+  padding:5px 14px;border-radius:999px;font-size:10px;font-weight:600;
+  letter-spacing:0.2px;color:var(--text-soft);opacity:.55;
+  background:var(--surface);border:1px solid var(--line);
+  pointer-events:none;white-space:nowrap;
+  -webkit-user-select:none;user-select:none;direction:rtl;
+}
+
+/* ====== MINI BTN (app-bar) ====== */
+.app-bar-mini{display:flex;align-items:center;gap:4px;}
+.mini-btn{
+  width:32px;height:32px;display:grid;place-items:center;
+  background:transparent;border:1px solid var(--line);border-radius:8px;
+  font-size:13px;color:var(--text-soft);cursor:pointer;
+  transition:background .12s ease, border-color .12s ease, color .12s ease;
+  touch-action:manipulation;position:relative;flex:0 0 auto;
+}
+.mini-btn:hover{background:var(--surface-2);border-color:var(--line-strong);color:var(--accent);}
+.mini-btn:active{transform:scale(.95);}
+@media (max-width:520px){
+  .mini-btn{width:30px;height:30px;font-size:12px;}
+}
+
+/* ====== CALENDAR ====== */
+.cal-wrap{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius-lg);padding:14px;margin-bottom:12px;
+  box-shadow:var(--shadow-xs);
+}
+.cal-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line);
+  flex-wrap:wrap;
+}
+.cal-head .cal-title{
+  font-size:14px;font-weight:800;color:var(--text);letter-spacing:-0.2px;
+}
+.cal-head .cal-title span{font-size:10.5px;color:var(--text-muted);font-weight:600;display:block;margin-top:2px;}
+.cal-nav{display:flex;align-items:center;gap:6px;}
+.cal-nav-btn{
+  width:34px;height:34px;display:grid;place-items:center;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:8px;
+  font-size:14px;color:var(--text-soft);cursor:pointer;
+  transition:background .12s ease, border-color .12s ease;
+  touch-action:manipulation;font-family:inherit;
+}
+.cal-nav-btn:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
+.cal-nav-btn:active{transform:scale(.95);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-dow{
+  text-align:center;font-size:10px;font-weight:700;color:var(--text-muted);
+  padding:6px 0;letter-spacing:0.3px;
+}
+.cal-day{
+  position:relative;aspect-ratio:1/1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;
+  background:transparent;border:1px solid transparent;border-radius:8px;
+  font-size:12px;font-weight:600;color:var(--text);
+  cursor:pointer;font-family:inherit;touch-action:manipulation;
+  transition:background .12s ease, border-color .12s ease;
+  min-height:0;padding:0;
+}
+.cal-day:hover:not(:disabled){background:var(--surface-2);}
+.cal-day.empty{cursor:default;color:transparent;}
+.cal-day.empty:hover{background:transparent;}
+.cal-day.today{border-color:var(--accent);color:var(--accent);font-weight:800;}
+.cal-day.has-jobs{background:var(--accent-soft);color:var(--accent-deep);font-weight:800;}
+.cal-day.has-jobs:hover{background:var(--accent);color:#fff;}
+.cal-day.selected{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:800;}
+.cal-day.selected .cal-dot{background:#fff;}
+.cal-day .cal-dot{
+  width:4px;height:4px;border-radius:50%;background:var(--accent);
+  position:absolute;bottom:5px;
+}
+.cal-day .cal-count{
+  position:absolute;top:3px;left:3px;
+  font-size:8px;font-weight:800;padding:1px 4px;border-radius:3px;
+  background:var(--accent);color:#fff;line-height:1.4;
+}
+.cal-day.selected .cal-count{background:rgba(255,255,255,.3);}
+@media (max-width:400px){
+  .cal-day{font-size:11px;border-radius:6px;}
+  .cal-day .cal-count{font-size:7px;padding:1px 3px;}
+  .cal-dow{font-size:9px;}
+}
+
+.hist-list-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin:14px 0 10px;font-size:12px;font-weight:800;color:var(--text);
+}
+.hist-list-head .hl-date{
+  font-size:12px;color:var(--accent);font-weight:800;
+  padding:4px 10px;border-radius:6px;background:var(--accent-soft);
+}
+.hist-list-head .hl-count{font-size:10.5px;color:var(--text-muted);font-weight:600;}
+.hist-job-list{display:flex;flex-direction:column;gap:8px;}
+.hist-job{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:11px 12px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  transition:border-color .12s ease;
+}
+.hist-job:hover{border-color:var(--line-strong);}
+.hist-job .hj-main{flex:1;min-width:0;}
+.hist-job .hj-title{
+  font-size:12.5px;font-weight:700;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.hist-job .hj-sub{
+  font-size:10.5px;color:var(--text-muted);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.hist-job .hj-badge{
+  font-size:10px;font-weight:800;padding:3px 9px;border-radius:5px;
+  flex:0 0 auto;white-space:nowrap;
+}
+
+/* ====== ANALYTICS ====== */
+.an-filter{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  box-shadow:var(--shadow-xs);flex-wrap:wrap;
+}
+.an-filter .anf-label{
+  font-size:11.5px;font-weight:700;color:var(--text-soft);
+  display:flex;align-items:center;gap:8px;
+}
+.an-filter .anf-label .anf-ico{
+  width:26px;height:26px;display:grid;place-items:center;border-radius:7px;
+  background:var(--accent-soft);color:var(--accent);font-size:13px;
+}
+.an-filter .anf-nav{display:flex;align-items:center;gap:6px;}
+.an-filter .anf-val{
+  font-size:12.5px;font-weight:800;color:var(--text);
+  min-width:90px;text-align:center;letter-spacing:-0.2px;
+}
+.an-summary{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line);
+  border-radius:var(--radius);overflow:hidden;margin-bottom:12px;
+}
+.an-summary .an-stat{
+  background:var(--surface);padding:10px;display:flex;flex-direction:column;gap:2px;
+}
+.an-summary .an-stat .an-num{
+  font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.4px;line-height:1.1;
+}
+.an-summary .an-stat .an-lbl{
+  font-size:9.5px;font-weight:600;color:var(--text-muted);
+  letter-spacing:0.3px;text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.an-chart-wrap{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius-lg);padding:14px;
+  box-shadow:var(--shadow-xs);margin-bottom:12px;
+}
+.an-chart-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line);
+}
+.an-chart-head .ach-title{
+  font-size:12px;font-weight:800;color:var(--text);
+  display:flex;align-items:center;gap:8px;
+}
+.an-chart-head .ach-title .ach-dot{width:7px;height:7px;border-radius:2px;background:var(--accent);}
+.an-chart-head .ach-meta{font-size:10px;font-weight:600;color:var(--text-muted);}
+.an-chart-canvas-wrap{position:relative;width:100%;}
+#anChartCanvas{display:block;width:100%;height:auto;touch-action:pan-y;}
+.an-legend{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;
+  padding-top:10px;border-top:1px solid var(--line);
+}
+.an-legend .al-item{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10.5px;font-weight:700;color:var(--text-soft);
+}
+.an-legend .al-item .al-sw{width:10px;height:10px;border-radius:3px;flex:0 0 auto;}
+.an-empty{
+  text-align:center;padding:32px 16px;color:var(--text-muted);
+  font-size:12px;
+}
+.an-detail-list{display:flex;flex-direction:column;gap:8px;}
+.an-detail-item{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:11px 12px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.an-detail-item .adi-main{flex:1;min-width:0;}
+.an-detail-item .adi-title{
+  font-size:12px;font-weight:800;color:var(--text);
+  display:flex;align-items:center;gap:8px;
+}
+.an-detail-item .adi-title .adi-sw{width:10px;height:10px;border-radius:3px;flex:0 0 auto;}
+.an-detail-item .adi-sub{font-size:10px;color:var(--text-muted);margin-top:3px;}
+.an-detail-item .adi-num{
+  font-size:15px;font-weight:800;color:var(--accent);
+  flex:0 0 auto;letter-spacing:-0.3px;
+}
+.an-detail-item.is-mini{padding:9px 12px;}
+.an-detail-item.is-mini .adi-title{font-size:11.5px;}
+.an-detail-item.is-mini .adi-num{font-size:13px;}
+
+/* ====== موبایل: تنظیمات نهایی ====== */
+@media (max-width:640px){
+  .landing-main{padding:24px 12px 40px;}
+  .hero-title{font-size:22px;line-height:1.5;}
+  .hero-description{font-size:12.5px;line-height:1.85;}
+  .dash-panel{padding:14px;}
+  .dash-stat .ds-num{font-size:20px;}
+  .wrap{padding:12px 10px 72px;}
+  .panel{padding:12px;}
+  .panel-head h2{font-size:12px;}
+  .form-grid{gap:8px;}
+  .input, textarea, select{padding:9px 11px;font-size:16px;}
+  .stats-bar{grid-template-columns:1fr 1fr;}
+  .stat-cell{padding:10px 12px;}
+  .stat-cell .st-num{font-size:18px;}
+  .quick-bar{padding:10px 12px;}
+  .chip{padding:6px 10px;font-size:11.5px;}
+  .job-card{padding:11px 12px;}
+  .job-card-title{font-size:13.5px;}
+  .sheet-body{padding:12px;}
+  .form-section{padding:12px;}
+  .type-selector{grid-template-columns:1fr 1fr;}
+  .opts-grid{grid-template-columns:1fr 1fr;}
+  .group-picker{grid-template-columns:1fr 1fr;}
+  .msgr-grid{grid-template-columns:repeat(3,1fr);}
+  .modal-box{padding:16px;}
+  .an-summary .an-stat{padding:9px;}
+  .an-summary .an-stat .an-num{font-size:16px;}
+  .an-summary .an-stat .an-lbl{font-size:9px;}
+}
+@media (max-width:380px){
+  .hero-title{font-size:20px;}
+  .dash-stat .ds-num{font-size:18px;}
+  .opts-grid{grid-template-columns:1fr;}
+  .type-selector{grid-template-columns:1fr;}
+  .group-picker{grid-template-columns:1fr;}
+  .msgr-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+}
+</style>
+</head><body>
+
+<!-- ============================================================
+     SCREEN 1: LANDING
+     ============================================================ -->
+<section class="screen active" id="landing">
+  <div class="landing-top-bar">
+    <div class="landing-top-inner">
+      <div class="brand-line">
+        <div class="brand-mark">فن</div>
+        <div class="brand-text">
+          <b>سامانه گزارش‌گیری فیبر نوری</b>
+          <span>FIBER REPORT SYSTEM</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="chip-status">پایدار</span>
+        <div class="app-bar-mini">
+          <button id="landingHistoryBtn" class="mini-btn" type="button" title="تاریخچه">🕘</button>
+          <button id="landingAnalyticsBtn" class="mini-btn" type="button" title="نمودار">📊</button>
+        </div>
+        <button id="themeBtnLanding" class="icon-action" type="button" title="تغییر تم">◐</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="landing-main">
+    <div class="hero-block">
+      <span class="hero-label">پنل عملیات میدانی</span>
+      <h1 class="hero-title">
+        مدیریت یکپارچه‌ی گزارش‌های<br />
+        <span class="accent">کابل‌کشی و فیوژن فیبر نوری</span>
+      </h1>
+      <p class="hero-description">
+        ابزار تخصصی برای تیم‌های اجرایی فیبر نوری؛ ثبت کارها، تولید خروجی استاندارد و
+        ارسال سریع گزارش برای پیمانکار — همه در یک بستر ساده و سریع.
+      </p>
+    </div>
+
+    <section class="dash-panel">
+      <div class="dash-side left">
+        <div class="dash-head">
+          <div class="dh-title">داشبورد عملیاتی</div>
+          <span class="dh-meta">زنده</span>
+        </div>
+
+        <div class="dash-stats">
+          <div class="dash-stat">
+            <div class="ds-num accent" id="dashTotal">0</div>
+            <div class="ds-lbl">کل کارها</div>
+          </div>
+          <div class="dash-stat">
+            <div class="ds-num gold" id="dashToday">0</div>
+            <div class="ds-lbl">امروز</div>
+          </div>
+          <div class="dash-stat">
+            <div class="ds-num ok" id="dashTypes">0</div>
+            <div class="ds-lbl">انواع فعال</div>
+          </div>
+        </div>
+
+        <div class="dash-breakdown">
+          <div class="dash-breakdown-head">
+            <span>توزیع نوع سرویس</span>
+            <span class="db-total" id="dashBreakdownTotal">۰ مورد</span>
+          </div>
+          <div class="dash-bars" id="dashBars"></div>
+        </div>
+
+        <div class="dash-actions">
+          <button class="dash-primary" id="dashOpenReport" type="button">
+            <div class="dp-txt">
+              <b>ورود به گزارش روزانه</b>
+              <span>ثبت کار جدید، خروجی و ارسال</span>
+            </div>
+            <span class="dp-arrow">←</span>
+          </button>
+          <div class="dash-secondary-row">
+            <button class="dash-secondary" id="dashOpenHistory" type="button">
+              <span class="ds-ico">🕘</span>
+              <div class="ds-txt">
+                <b>تاریخچه کارها</b>
+                <span>تقویم و آرشیو</span>
+              </div>
+            </button>
+            <button class="dash-secondary" id="dashOpenAnalytics" type="button">
+              <span class="ds-ico">📊</span>
+              <div class="ds-txt">
+                <b>نمودار عملکرد</b>
+                <span>گزارش ماهانه</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-side right">
+        <div class="dash-status">
+          <div class="dash-status-head">
+            <b>وضعیت سامانه</b>
+            <span>آماده</span>
+          </div>
+          <div class="dash-status-list">
+            <div class="dash-status-item ok">
+              <span class="dsi-dot"></span>
+              <span class="dsi-text">حافظه‌ی محلی</span>
+              <span class="dsi-val">فعال</span>
+            </div>
+            <div class="dash-status-item info">
+              <span class="dsi-dot"></span>
+              <span class="dsi-text">قالب خروجی</span>
+              <span class="dsi-val">متن / تصویر / PDF</span>
+            </div>
+            <div class="dash-status-item warn">
+              <span class="dsi-dot"></span>
+              <span class="dsi-text">ماژول درآمد</span>
+              <span class="dsi-val">در دست توسعه</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-recent">
+          <div class="dash-recent-head">آخرین کارهای ثبت‌شده</div>
+          <div class="dash-recent-list" id="dashRecentList"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-label">ماژول‌های سامانه</div>
+
+    <div class="modules-grid">
+      <button class="module-card featured" id="openReportBtn" type="button">
+        <div class="module-head">
+          <div class="module-icon">📋</div>
+          <span class="module-badge live">فعال</span>
+        </div>
+        <div class="module-body">
+          <h3>گزارش روزانه کابل‌کشی فیبر نوری</h3>
+          <p>
+            ثبت کارهای FTTH، Swap، بسترسازی، خرابی، انواع سفارشی و تعیین وضعیت —
+            با فیلدهای قابل تنظیم و خروجی متنی، تصویری و PDF.
+          </p>
+        </div>
+        <div class="module-foot">
+          <div class="module-tags">
+            <span class="m-tag">TXT</span><span class="m-tag">PNG</span>
+            <span class="m-tag">PDF</span><span class="m-tag">اشتراک‌گذاری</span>
+          </div>
+          <span class="module-arrow">←</span>
+        </div>
+      </button>
+
+      <button class="module-card disabled" id="incomeBtn" type="button" aria-disabled="true">
+        <div class="module-head">
+          <div class="module-icon">💰</div>
+          <span class="module-badge">در دست توسعه</span>
+        </div>
+        <div class="module-body">
+          <h3>محاسبه‌گر درآمد و تعرفه‌ها</h3>
+          <p>
+            محاسبه‌ی خودکار درآمد بر اساس تعرفه‌های پیمانکار و ارائه‌ی گزارش‌های
+            مالی روزانه، هفتگی و ماهانه.
+          </p>
+        </div>
+        <div class="module-foot">
+          <div class="module-tags">
+            <span class="m-tag">تعرفه پیمانکار</span><span class="m-tag">گزارش مالی</span>
+          </div>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <footer class="landing-footer">
+    <div class="landing-footer-inner">
+      <span>حقوق مادی و معنوی محفوظ است</span>
+      <span>طراحی و توسعه: <b>SeDmAmAd</b></span>
+    </div>
+  </footer>
+</section>
+
+<!-- ============================================================
+     SCREEN 2: REPORT APP
+     ============================================================ -->
+<section class="screen" id="reportApp">
+  <header class="app-bar">
+    <div class="app-bar-inner">
+      <div class="app-bar-left">
+        <button id="homeBtn" class="home-btn" type="button" title="بازگشت به خانه">
+          <span class="hb-ico">⌂</span>
+          <span class="hb-label">بازگشت به خانه</span>
+        </button>
+        <div class="app-bar-title">
+          <b>گزارش روزانه کابل‌کشی</b>
+          <span>پنل عملیات میدانی</span>
+        </div>
+      </div>
+      <div class="app-bar-right">
+        <button id="historyBtn" class="mini-btn" type="button" title="تاریخچه">🕘</button>
+        <button id="analyticsBtn" class="mini-btn" type="button" title="نمودار">📊</button>
+        <button id="themeBtn" class="icon-action" type="button" title="تغییر تم">◐</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="panel">
+      <div class="panel-head">
+        <h2><span class="dot"></span> تنظیمات گزارش</h2>
+        <span class="panel-meta">پایه‌ای</span>
+      </div>
+      <div class="form-grid cols-3">
+        <label class="field">
+          <span class="field-label">تاریخ گزارش</span>
+          <div class="date-row">
+            <input id="reportDate" class="input" type="text" placeholder="۱۴۰۳/۰۸/۱۵" inputmode="numeric" />
+            <button id="todayBtn" class="btn-inline" type="button">امروز</button>
+          </div>
+        </label>
+        <label class="field">
+          <span class="field-label">کیلومتر ماشین</span>
+          <input id="carKm" class="input" type="text" placeholder="۰" autocomplete="off" />
+        </label>
+        <label class="field">
+          <span class="field-label">نام تیم</span>
+          <input id="team" class="input" type="text" placeholder="تیم ۱" autocomplete="off" />
+        </label>
+      </div>
+      <!-- تگ‌گذاری از اینجا حذف شد — فقط داخل فرم کار جدید -->
+    </section>
+
+    <div class="stats-bar">
+      <div class="stat-cell accent">
+        <div class="st-num" id="count">0</div>
+        <div class="st-lbl">کار ثبت‌شده</div>
+      </div>
+      <button id="addBtn" class="btn btn-primary" type="button">+ افزودن کار جدید</button>
+      <div></div>
+      <button id="exportBtn" class="btn btn-ghost" type="button">خروجی کامل</button>
+    </div>
+
+    <section class="quick-bar">
+      <div class="quick-bar-head">خروجی سریع بر اساس نوع</div>
+      <div class="quick-chips" id="quickExportGrid"></div>
+    </section>
+
+    <div class="filter-bar">
+      <input id="search" class="input" type="search" placeholder="جستجو در کارها…" autocomplete="off" />
+      <select id="filterType" class="input" aria-label="فیلتر نوع"></select>
+    </div>
+
+    <div id="jobList" class="job-list"></div>
+
+    <div id="emptyState" class="empty-state" hidden>
+      <div class="es-mark">◇</div>
+      <p>هیچ کاری ثبت نشده است</p>
+      <p class="muted">برای شروع، روی «افزودن کار جدید» بزنید</p>
+    </div>
+
+    <section class="danger-panel">
+      <div class="dp-head"><span class="dp-dot"></span>مدیریت داده‌ها</div>
+      <p class="dp-desc">
+        داده‌ها به‌صورت محلی در مرورگر این دستگاه ذخیره می‌شوند. برای پایان روز یا شروع
+        چرخه‌ی جدید، از گزینه‌های زیر استفاده کنید.
+      </p>
+      <div class="reset-list">
+        <button id="clearJobsBtn" class="reset-item ri-warn" type="button">
+          <span class="ri-ico">◇</span>
+          <span class="ri-text">
+            <b>حذف لیست کارها</b>
+            <span>فقط کارها پاک می‌شوند — تاریخ، تیم و کیلومتر حفظ می‌شوند</span>
+          </span>
+        </button>
+        <button id="fullResetBtn" class="reset-item ri-danger" type="button">
+          <span class="ri-ico">◆</span>
+          <span class="ri-text">
+            <b>ریست کامل برنامه</b>
+            <span>همه‌ی داده‌ها، تاریخ، تیم، کیلومتر و تنظیمات حذف می‌شوند</span>
+          </span>
+        </button>
+        <button id="hardResetBtn" class="reset-item ri-strong" type="button">
+          <span class="ri-ico">▣</span>
+          <span class="ri-text">
+            <b>حذف کامل حافظه‌ی مرورگر</b>
+            <span>پاک‌سازی کامل کلیدهای مرتبط و بارگذاری مجدد</span>
+          </span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ====== فرم کار (sheet) ====== -->
+  <div id="formOverlay" class="sheet-overlay" hidden>
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-head">
+        <div>
+          <h2 id="formTitle">کار جدید</h2>
+          <span class="sheet-sub" id="formSub">اطلاعات مورد نیاز را تکمیل کنید</span>
+        </div>
+        <button id="closeFormBtn" class="close-x" type="button" aria-label="بستن">✕</button>
+      </div>
+
+      <div class="sheet-body">
+        <form id="jobForm" autocomplete="off" novalidate>
+
+          <section class="form-section">
+            <div class="form-section-head">
+              <h3>نوع تحویلی</h3>
+              <span class="fs-meta">الزامی</span>
+            </div>
+            <div class="form-body">
+              <div class="type-selector" id="typeGrid">
+                <div class="type-item" data-type="FTTH" role="button" tabindex="0">
+                  <span><span class="ti-name">FTTH</span><span class="ti-sub">فیبر تا خانه</span></span>
+                </div>
+                <div class="type-item" data-type="Swap" role="button" tabindex="0">
+                  <span><span class="ti-name">Swap</span><span class="ti-sub">تعویض</span></span>
+                </div>
+                <div class="type-item" data-type="بسترسازی" role="button" tabindex="0">
+                  <span><span class="ti-name">بسترسازی</span><span class="ti-sub">آماده‌سازی</span></span>
+                </div>
+                <div class="type-item" data-type="خرابی" role="button" tabindex="0">
+                  <span><span class="ti-name">خرابی</span><span class="ti-sub">رفع خرابی</span></span>
+                </div>
+                <div class="type-item" data-type="تعیین وضعیت" role="button" tabindex="0">
+                  <span><span class="ti-name">تعیین وضعیت</span><span class="ti-sub">گزارش ساده</span></span>
+                </div>
+                <button class="type-add" id="addCustomTypeBtn" type="button">
+                  <span>+</span> افزودن نوع سفارشی
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ====== تگ‌گذاری (فقط داخل فرم) ====== -->
+          <section class="form-section">
+            <div class="form-section-head">
+              <h3>وضعیت این کار</h3>
+              <span class="fs-meta">فقط داخلی — در خروجی نمی‌آید</span>
+            </div>
+            <div class="form-body">
+              <div class="tag-form-block">
+                <div class="tag-form-head">
+                  <span>یک وضعیت انتخاب کنید</span>
+                  <span class="tfh-current" id="tagFormCurrent">انجام شده</span>
+                </div>
+                <div class="tag-form-grid" id="tagFormGrid">
+                  <button class="tag-form-choice active" data-tag="done" type="button">
+                    <span class="tfc-sw">✓</span>
+                    <span class="tfc-lbl">انجام شده</span>
+                    <span class="tfc-ck">✓</span>
+                  </button>
+                  <button class="tag-form-choice" data-tag="undone" type="button">
+                    <span class="tfc-sw">✗</span>
+                    <span class="tfc-lbl">انجام نشده</span>
+                    <span class="tfc-ck">✓</span>
+                  </button>
+                  <button class="tag-form-choice" data-tag="fusion" type="button">
+                    <span class="tfc-sw">🔥</span>
+                    <span class="tfc-lbl">پیگیری فیوژن</span>
+                    <span class="tfc-ck">✓</span>
+                  </button>
+                  <button class="tag-form-choice" data-tag="admin" type="button">
+                    <span class="tfc-sw">📋</span>
+                    <span class="tfc-lbl">پیگیری اداری</span>
+                    <span class="tfc-ck">✓</span>
+                  </button>
+                  <button class="tag-form-choice" data-tag="none" type="button">
+                    <span class="tfc-sw">—</span>
+                    <span class="tfc-lbl">بدون تگ</span>
+                    <span class="tfc-ck">✓</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <div class="form-section-head">
+              <h3>اطلاعات مورد نیاز</h3>
+              <span class="fs-meta">هر فیلد را می‌توانید فعال/غیرفعال کنید</span>
+            </div>
+            <div class="form-body">
+              <div class="opts-grid" id="optsGrid"></div>
+            </div>
+          </section>
+
+          <div id="dynamicFieldsHost"></div>
+
+          <section class="form-section">
+            <div class="form-section-head">
+              <h3>توضیحات</h3>
+              <span class="fs-meta">اختیاری</span>
+            </div>
+            <div class="form-body">
+              <label class="desc-toggle">
+                <input id="hasDesc" type="checkbox" />
+                <span class="dt-switch"></span>
+                <span class="dt-label">افزودن توضیحات به این کار</span>
+              </label>
+              <div id="descWrap" class="desc-textarea-wrap">
+                <textarea id="desc" name="desc" rows="3" placeholder="توضیحات تکمیلی…"></textarea>
+              </div>
+            </div>
+          </section>
+
+        </form>
+      </div>
+
+      <div class="sheet-foot">
+        <button id="saveNextBtn" class="btn btn-ghost" type="button">ذخیره و بعدی</button>
+        <button id="saveBtn" class="btn btn-primary" type="button">ذخیره کار</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== مودال نوع سفارشی ====== -->
+  <div id="customTypeModal" class="modal-overlay" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <h3>افزودن نوع تحویلی جدید</h3>
+      <p class="mb-desc">نام دلخواه برای این نوع را وارد کنید.</p>
+      <div class="field" style="text-align:right;margin-bottom:14px;">
+        <span class="field-label">نام نوع</span>
+        <input id="newCustomTypeName" class="input" type="text" placeholder="مثلاً: نصب ONT، رفع اختلال…" autocomplete="off" maxlength="40" />
+      </div>
+      <div class="mb-actions">
+        <button class="btn btn-primary" id="customTypeAdd" type="button">افزودن</button>
+        <button class="btn btn-ghost" id="customTypeCancel" type="button">انصراف</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== مودال فیلد سفارشی ====== -->
+  <div id="customFieldModal" class="modal-overlay" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" style="max-width:460px;text-align:right;">
+      <h3 style="text-align:center;">افزودن فیلد اطلاعاتی جدید</h3>
+      <p class="mb-desc" style="text-align:center;">
+        یک فیلد دلخواه بساز، دسته‌بندی مورد نظر را انتخاب کن تا در جای درست فرم و خروجی قرار بگیرد.
+      </p>
+
+      <div class="field" style="margin-bottom:12px;">
+        <span class="field-label">نام فیلد</span>
+        <input id="newFieldName" class="input" type="text" placeholder="مثلاً: کد ملی، کد پستی، سریال مودم…" autocomplete="off" maxlength="40" />
+      </div>
+
+      <div class="field" style="margin-bottom:12px;">
+        <span class="field-label">استیکر خروجی (اختیاری)</span>
+        <input id="newFieldSticker" class="input" type="text" placeholder="یک ایموجی، مثلاً: 🆔 یا 📮" autocomplete="off" maxlength="4" />
+      </div>
+
+      <div class="field" style="margin-bottom:6px;">
+        <span class="field-label">دسته‌بندی</span>
+      </div>
+
+      <div class="group-picker" id="groupPicker">
+        <button type="button" class="gp-item" data-group="cable-info">
+          <span class="gp-ico">🔌</span>
+          <span class="gp-lbl">اطلاعات کابل</span>
+        </button>
+        <button type="button" class="gp-item" data-group="customer">
+          <span class="gp-ico">🏠</span>
+          <span class="gp-lbl">اطلاعات مشتری</span>
+        </button>
+        <button type="button" class="gp-item" data-group="cable-specs">
+          <span class="gp-ico">🧵</span>
+          <span class="gp-lbl">مشخصات کابل</span>
+        </button>
+        <button type="button" class="gp-item" data-group="contact">
+          <span class="gp-ico">☎️</span>
+          <span class="gp-lbl">اطلاعات تماس</span>
+        </button>
+        <button type="button" class="gp-item" data-group="optional">
+          <span class="gp-ico">◈</span>
+          <span class="gp-lbl">اختیاری</span>
+        </button>
+        <button type="button" class="gp-item active" data-group="custom">
+          <span class="gp-ico">✨</span>
+          <span class="gp-lbl">سفارشی</span>
+        </button>
+      </div>
+
+      <div class="mb-actions" style="margin-top:14px;">
+        <button class="btn btn-primary" id="customFieldAdd" type="button">افزودن فیلد</button>
+        <button class="btn btn-ghost" id="customFieldCancel" type="button">انصراف</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== مودال خروجی ====== -->
+  <div id="exportOverlay" class="sheet-overlay" hidden>
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-head">
+        <div>
+          <h2 id="exportTitle">خروجی گزارش</h2>
+          <span class="sheet-sub">قالب، محدوده و تنظیمات را انتخاب کنید</span>
+        </div>
+        <button id="closeExportBtn" class="close-x" type="button" aria-label="بستن">✕</button>
+      </div>
+
+      <div class="sheet-body">
+        <div class="export-summary">
+          <div class="export-summary-head">محدوده‌ی خروجی</div>
+          <div class="scope-chips" id="exportScopeGrid"></div>
+        </div>
+
+        <label class="meta-switch">
+          <input id="includeMeta" type="checkbox" checked />
+          <span class="ms-switch"></span>
+          <span class="ms-label">اعمال تیم و کیلومتر ماشین در خروجی</span>
+        </label>
+
+        <div class="tabs" role="tablist">
+          <button class="tab-btn active" data-tab="text" type="button">متن</button>
+          <button class="tab-btn" data-tab="image" type="button">تصویر</button>
+          <button class="tab-btn" data-tab="pdf" type="button">PDF</button>
+        </div>
+
+        <div class="tab-panel" data-panel="text">
+          <textarea id="exportText" class="export-textarea" readonly spellcheck="false"></textarea>
+        </div>
+
+        <div class="tab-panel" data-panel="image" hidden>
+          <div id="imagePreviewWrap">
+            <div id="reportPreview" class="report-doc"></div>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="pdf" hidden>
+          <div style="background:var(--surface-2);border:1px dashed var(--line);border-radius:var(--radius-sm);padding:24px;text-align:center;">
+            <div style="font-size:30px;margin-bottom:10px;color:var(--text-soft);">▤</div>
+            <p style="font-size:13px;font-weight:700;margin-bottom:6px;">خروجی PDF آماده‌ی دریافت است</p>
+            <p style="font-size:11.5px;color:var(--text-muted);margin-bottom:16px;line-height:1.8;">
+              فایل با همان ساختار تصویری مدرن تولید می‌شود.
+            </p>
+            <button id="pdfDownloadInline" class="btn btn-primary" type="button">دریافت / ارسال PDF</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sheet-foot" id="exportFoot"></div>
+    </div>
+  </div>
+
+  <!-- ====== مودال‌های عمومی ====== -->
+  <div id="actionModal" class="modal-overlay" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <h3 id="actionTitle">دریافت یا ارسال؟</h3>
+      <p class="mb-desc" id="actionSub">فایل آماده است.</p>
+      <div class="mb-actions">
+        <button class="btn btn-ghost" id="actDownload" type="button">دانلود روی دستگاه</button>
+        <button class="btn btn-primary" id="actShare" type="button">اشتراک‌گذاری / ارسال</button>
+      </div>
+      <button class="mb-cancel" id="actCancel" type="button">انصراف</button>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="modal-overlay" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <h3 class="danger" id="confirmTitle">تأیید عملیات</h3>
+      <p class="mb-desc" id="confirmSub">آیا مطمئن هستید؟</p>
+      <div class="mb-actions">
+        <button class="btn btn-danger" id="confirmYes" type="button">تأیید و ادامه</button>
+        <button class="btn btn-ghost" id="confirmNo" type="button">انصراف</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="messengerModal" class="modal-overlay" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" style="max-width:440px;">
+      <h3>انتخاب پیام‌رسان</h3>
+      <p class="mb-desc">پیام‌رسان مورد نظر برای ارسال را انتخاب کنید.</p>
+
+      <div class="msgr-grid">
+        <button class="msgr-btn msgr-telegram" data-app="telegram" type="button">
+          <span class="msgr-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg></span>
+          <span class="msgr-name">تلگرام</span>
+        </button>
+        <button class="msgr-btn msgr-eitaa" data-app="eitaa" type="button">
+          <span class="msgr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
+          <span class="msgr-name">ایتا</span>
+        </button>
+        <button class="msgr-btn msgr-bale" data-app="bale" type="button">
+          <span class="msgr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-5"/></svg></span>
+          <span class="msgr-name">بله</span>
+        </button>
+        <button class="msgr-btn msgr-soroush" data-app="soroush" type="button">
+          <span class="msgr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l2.5 6.5L21 9l-5 4.5 1.5 7L12 17l-5.5 3.5L8 13.5 3 9l6.5-.5z"/></svg></span>
+          <span class="msgr-name">سروش</span>
+        </button>
+        <button class="msgr-btn msgr-whatsapp" data-app="whatsapp" type="button">
+          <span class="msgr-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.05 4.91A9.82 9.82 0 0 0 12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01zM12.04 20.15c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c.02 4.54-3.68 8.24-8.22 8.24zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.48-1.38-1.73-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43-.14-.01-.31-.01-.48-.01-.17 0-.43.06-.66.31-.23.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.23-.17-.48-.29z"/></svg></span>
+          <span class="msgr-name">واتساپ</span>
+        </button>
+        <button class="msgr-btn msgr-pinterest" data-app="pinterest" type="button">
+          <span class="msgr-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.24 2.64 7.86 6.36 9.32-.09-.79-.17-2.01.03-2.88.19-.79 1.22-5.02 1.22-5.02s-.31-.62-.31-1.55c0-1.45.84-2.53 1.89-2.53.89 0 1.32.67 1.32 1.47 0 .89-.57 2.23-.86 3.47-.25 1.04.52 1.88 1.54 1.88 1.85 0 3.27-1.95 3.27-4.76 0-2.49-1.79-4.23-4.34-4.23-2.96 0-4.69 2.22-4.69 4.51 0 .89.34 1.85.77 2.37.08.1.09.19.07.29-.08.32-.26 1.04-.29 1.19-.05.19-.15.23-.36.14-1.34-.62-2.18-2.58-2.18-4.15 0-3.38 2.46-6.49 7.08-6.49 3.72 0 6.61 2.65 6.61 6.19 0 3.69-2.33 6.66-5.56 6.66-1.09 0-2.11-.57-2.46-1.23l-.67 2.55c-.24.93-.9 2.09-1.34 2.8.99.31 2.05.48 3.15.48 5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg></span>
+          <span class="msgr-name">پینترست</span>
+        </button>
+      </div>
+
+      <button class="mb-cancel" id="messengerCancel" type="button">بازگشت</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCREEN 3: HISTORY
+     ============================================================ -->
+<section class="screen" id="historyScreen">
+  <header class="app-bar">
+    <div class="app-bar-inner">
+      <div class="app-bar-left">
+        <button id="historyBackBtn" class="home-btn" type="button">
+          <span class="hb-ico">←</span>
+          <span class="hb-label">بازگشت</span>
+        </button>
+        <div class="app-bar-title">
+          <b>تاریخچه کارها</b>
+          <span>آرشیو روزانه</span>
+        </div>
+      </div>
+      <div class="app-bar-right">
+        <button id="historyHomeBtn" class="mini-btn" type="button" title="خانه">⌂</button>
+        <button id="themeBtnHistory" class="icon-action" type="button" title="تغییر تم">◐</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="cal-wrap">
+      <div class="cal-head">
+        <div class="cal-title" id="calTitle">—<span id="calSub">تقویم ماهانه</span></div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn" id="calPrev" type="button" title="ماه قبل">‹</button>
+          <button class="cal-nav-btn" id="calToday" type="button" title="ماه جاری" style="width:auto;padding:0 10px;font-size:11px;">امروز</button>
+          <button class="cal-nav-btn" id="calNext" type="button" title="ماه بعد">›</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+
+    <div class="hist-list-head">
+      <span class="hl-date" id="histDateLabel">—</span>
+      <span class="hl-count" id="histCountLabel">۰ مورد</span>
+    </div>
+
+    <div class="hist-job-list" id="histJobList"></div>
+    <div class="empty-state" id="histEmpty" hidden>
+      <div class="es-mark">◇</div>
+      <p>در این روز کاری ثبت نشده</p>
+      <p class="muted">روز دیگری را از تقویم انتخاب کنید</p>
+    </div>
+  </main>
+</section>
+
+<!-- ============================================================
+     SCREEN 4: ANALYTICS
+     ============================================================ -->
+<section class="screen" id="analyticsScreen">
+  <header class="app-bar">
+    <div class="app-bar-inner">
+      <div class="app-bar-left">
+        <button id="analyticsBackBtn" class="home-btn" type="button">
+          <span class="hb-ico">←</span>
+          <span class="hb-label">بازگشت</span>
+        </button>
+        <div class="app-bar-title">
+          <b>نمودار عملکرد</b>
+          <span>گزارش ماهانه</span>
+        </div>
+      </div>
+      <div class="app-bar-right">
+        <button id="analyticsHomeBtn" class="mini-btn" type="button" title="خانه">⌂</button>
+        <button id="themeBtnAnalytics" class="icon-action" type="button" title="تغییر تم">◐</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="an-filter">
+      <div class="anf-label">
+        <span class="anf-ico">📅</span>
+        <span>دوره‌ی گزارش</span>
+      </div>
+      <div class="anf-nav">
+        <button class="cal-nav-btn" id="anPrev" type="button" title="ماه قبل">‹</button>
+        <span class="anf-val" id="anPeriodLabel">—</span>
+        <button class="cal-nav-btn" id="anNext" type="button" title="ماه بعد">›</button>
+      </div>
+    </div>
+
+    <div class="an-summary">
+      <div class="an-stat">
+        <div class="an-num" id="anTotal">۰</div>
+        <div class="an-lbl">کل کارها</div>
+      </div>
+      <div class="an-stat">
+        <div class="an-num" id="anDays">۰</div>
+        <div class="an-lbl">روز فعال</div>
+      </div>
+      <div class="an-stat">
+        <div class="an-num" id="anAvg">۰</div>
+        <div class="an-lbl">میانگین روزانه</div>
+      </div>
+    </div>
+
+    <div class="an-chart-wrap">
+      <div class="an-chart-head">
+        <div class="ach-title"><span class="ach-dot"></span> عملکرد ماهانه</div>
+        <span class="ach-meta" id="anChartMeta">—</span>
+      </div>
+      <div class="an-chart-canvas-wrap">
+        <canvas id="anChartCanvas" width="700" height="320"></canvas>
+      </div>
+      <div class="an-legend" id="anLegend"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2><span class="dot"></span> جزئیات نوع تحویلی</h2>
+        <span class="panel-meta" id="anDetailMeta">—</span>
+      </div>
+      <div class="an-detail-list" id="anDetailList"></div>
+      <div class="an-empty" id="anDetailEmpty" hidden>در این ماه کاری ثبت نشده است</div>
+    </div>
+  </main>
+</section>
+
+<div id="toastWrap" class="toast-wrap" aria-live="polite"></div>
+<div class="glass-footer">حقوقن و نشر SeDmAmAd</div><script>
+(function () {
+  'use strict';
+
+  function $(id){ return document.getElementById(id); }
+  var FA = '۰۱۲۳۴۵۶۷۸۹';
+  var AR = '٠١٢٣٤٥٦٧٨٩';
+
+  function toEn(s){
+    return String(s)
+      .replace(/[۰-۹]/g, function(d){ return String(FA.indexOf(d)); })
+      .replace(/[٠-٩]/g, function(d){ return String(AR.indexOf(d)); });
+  }
+  function toFa(s){ return String(s).replace(/\d/g, function(d){ return FA[+d]; }); }
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function uid(){ return 'j' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function uidField(){ return 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+  /* ============================================================
+     تقویم شمسی
+     ============================================================ */
+  var JALALI_MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+  var JALALI_DOW = ['ش','ی','د','س','چ','پ','ج'];
+
+  function div(a, b){ return Math.floor(a / b); }
+  function mod(a, b){ return a - Math.floor(a / b) * b; }
+
+  function g2j(gy, gm, gd){
+    var g_d_m = [0,31,59,90,120,151,181,212,243,273,304,334];
+    var jy;
+    if (gy > 1600){ jy = 979; gy -= 1600; }
+    else { jy = 0; gy -= 621; }
+    var gy2 = (gm > 2) ? (gy + 1) : gy;
+    var days = (365 * gy) + div((gy2 + 3), 4) - div((gy2 + 99), 100)
+             + div((gy2 + 399), 400) - 80 + gd + g_d_m[gm - 1];
+    jy += 33 * div(days, 12053);
+    days = mod(days, 12053);
+    jy += 4 * div(days, 1461);
+    days = mod(days, 1461);
+    if (days > 365){
+      jy += div((days - 1), 365);
+      days = mod((days - 1), 365);
+    }
+    var jm, jd;
+    if (days < 186){
+      jm = 1 + div(days, 31);
+      jd = 1 + mod(days, 31);
+    } else {
+      jm = 7 + div((days - 186), 30);
+      jd = 1 + mod((days - 186), 30);
+    }
+    return { jy: jy, jm: jm, jd: jd };
+  }
+
+  function j2g(jy, jm, jd){
+    var gy;
+    if (jy > 979){ gy = 1600; jy -= 979; }
+    else { gy = 621; }
+    var days = (365 * jy) + (div(jy, 33) * 8) + div(mod(jy, 33) + 3, 4) + 78 + jd
+             + ((jm < 7) ? ((jm - 1) * 31) : (((jm - 7) * 30) + 186));
+    gy += 400 * div(days, 146097);
+    days = mod(days, 146097);
+    var leap = true;
+    if (days >= 36525){
+      days--;
+      gy += 100 * div(days, 36524);
+      days = mod(days, 36524);
+      if (days >= 365) days++;
+      else leap = false;
+    }
+    gy += 4 * div(days, 1461);
+    days = mod(days, 1461);
+    if (days >= 366){ leap = false; days--; }
+    gy += div(days, 365);
+    days = mod(days, 365);
+    var gd_m = [0,31,28,31,30,31,30,31,31,30,31,30,31];
+    if (leap) gd_m[1] = 29;
+    var gm;
+    for (gm = 0; gm < 13; gm++){
+      if (days < gd_m[gm]) break;
+      days -= gd_m[gm];
+    }
+    return { gy: gy, gm: gm, gd: days + 1 };
+  }
+
+  function jWeekday(jy, jm, jd){
+    var g = j2g(jy, jm, jd);
+    var d = new Date(g.gy, g.gm - 1, g.gd);
+    return (d.getDay() + 1) % 7;
+  }
+
+  function isJLeap(jy){
+    return mod((jy + 12), 33) % 4 === 0;
+  }
+  function jMonthDays(jy, jm){
+    if (jm <= 6) return 31;
+    if (jm <= 11) return 30;
+    return isJLeap(jy) ? 30 : 29;
+  }
+
+  function todayJalali(){
+    var d = new Date();
+    return g2j(d.getFullYear(), d.getMonth() + 1, d.getDate());
+  }
+
+  function pad2(n){ return (n < 10 ? '0' : '') + n; }
+
+  function parseJalali(str){
+    if (!str) return null;
+    var en = toEn(String(str).trim());
+    var m = en.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);
+    if (!m) return null;
+    var jy = +m[1], jm = +m[2], jd = +m[3];
+    if (jy < 1300 || jy > 1500) return null;
+    if (jm < 1 || jm > 12) return null;
+    if (jd < 1 || jd > jMonthDays(jy, jm)) return null;
+    return { jy: jy, jm: jm, jd: jd };
+  }
+  function jalaliToKey(o){ return o.jy + '/' + pad2(o.jm) + '/' + pad2(o.jd); }
+  function jalaliToFa(o){ return toFa(o.jy) + '/' + toFa(pad2(o.jm)) + '/' + toFa(pad2(o.jd)); }
+
+  function dayKeyOfJob(job){
+    if (job && job.dateKey) return job.dateKey;
+    if (job && job.date) {
+      var p = parseJalali(job.date);
+      if (p) return jalaliToKey(p);
+    }
+    return '';
+  }
+
+  /* ============================================================
+     تگ‌ها (فقط برای فرم و تاریخچه — در خروجی نمایش داده نمی‌شود)
+     ============================================================ */
+  var TAGS = {
+    'done':   { label:'انجام شده',           emoji:'✅', color:'#15803d' },
+    'undone': { label:'انجام نشده',          emoji:'❌', color:'#b45309' },
+    'fusion': { label:'نیازمند پیگیری فیوژن', emoji:'🔥', color:'#7e22ce' },
+    'admin':  { label:'نیازمند پیگیری اداری', emoji:'📋', color:'#0369a1' },
+    'none':   { label:'بدون تگ',             emoji:'—',  color:'#94a3b8' }
+  };
+  var TAG_KEYS = ['done','undone','fusion','admin','none'];
+
+  function tagMeta(k){ return TAGS[k] || TAGS['none']; }
+  function tagEmoji(k){ return tagMeta(k).emoji; }
+  function tagLabel(k){ return tagMeta(k).label; }
+
+  /* ============================================================
+     ساختار فیلدها
+     ============================================================ */
+  var LS_KEY = 'fiber_daily_v11';
+  var LS_THEME = 'fiber_theme_v11';
+  var LS_OPTS = 'fiber_opts_v11';
+  var LS_TYPES = 'fiber_types_v11';
+  var LS_FIELDS = 'fiber_custom_fields_v11';
+  var LS_HISTORY = 'fiber_history_v11';
+
+  var BLANK_BETWEEN = 3;
+  var BLANK_BEFORE_TAIL = 3;
+  var STATUS_TYPE = 'تعیین وضعیت';
+  var BASE_TYPES = ['FTTH', 'Swap', 'بسترسازی', 'خرابی'];
+
+  var TYPE_STICKER = {
+    'FTTH': '🌐','Swap': '🔄','بسترسازی': '🧱','خرابی': '⚠️','تعیین وضعیت': '📌'
+  };
+
+  var BASE_FIELDS = [
+    { id:'odc',       label:'ODC',              sticker:'🔢', group:'cable-info',  pair:false },
+    { id:'fat',       label:'FAT',              sticker:'📦', group:'cable-info',  pair:false },
+    { id:'mini',      label:'باکس مینی',         sticker:'🗃️', group:'cable-info',  pair:false },
+    { id:'address',   label:'آدرس',              sticker:'🏠', group:'customer',    pair:false },
+    { id:'pelak',     label:'پلاک',              sticker:'🔢', group:'customer',    pair:false },
+    { id:'unit',      label:'واحد',              sticker:'🚪', group:'customer',    pair:false },
+    { id:'name',      label:'نام مشتری',         sticker:'👤', group:'customer',    pair:false },
+    { id:'k8s',       label:'کابل ۸ کر',         sticker:'🧵', group:'cable-specs', pair:true, extra:'k8e' },
+    { id:'k2s',       label:'کابل ۲ کر',         sticker:'🧵', group:'cable-specs', pair:true, extra:'k2e' },
+    { id:'phone',     label:'تلفن ثابت',         sticker:'☎️', group:'contact',     pair:false },
+    { id:'virtual',   label:'شماره مجازی',       sticker:'📞', group:'contact',     pair:false },
+    { id:'mobile',    label:'تلفن همراه',        sticker:'📱', group:'contact',     pair:false }
+  ];
+
+  var customFields = [];
+
+  function allFields(){ return BASE_FIELDS.concat(customFields); }
+  function getFieldById(id){
+    var all = allFields();
+    for (var i=0; i<all.length; i++) if (all[i].id === id) return all[i];
+    return null;
+  }
+
+  var ALLOWED_GROUPS = ['cable-info', 'customer', 'cable-specs', 'contact', 'optional', 'custom'];
+  var GROUP_LABELS = {
+    'cable-info': 'اطلاعات کابل',
+    'customer': 'اطلاعات مشتری',
+    'cable-specs': 'مشخصات کابل',
+    'contact': 'اطلاعات تماس',
+    'optional': 'اختیاری',
+    'custom': 'سفارشی'
+  };
+
+  var customTypes = [];
+  var state = { reportDate:'', carKm:'', team:'', jobs:[] };
+  var history = [];
+
+  var currentType = 'FTTH';
+  var exportScope = '';
+  var editingId = null;
+  var formDirty = false;
+  var lastIdsKey = '';
+  var currentFormTag = 'done';   /* تگ کارِ در حال ثبت (فقط در فرم) */
+
+  var optionalState = {};
+  var pendingShare = { kind:null, text:'', canvas:null, blob:null, filename:'' };
+
+  var toastWrap = $('toastWrap');
+  function toast(msg){
+    var el = document.createElement('div');
+    el.className = 'toast'; el.textContent = msg;
+    toastWrap.appendChild(el);
+    setTimeout(function(){
+      el.classList.add('out');
+      setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 220);
+    }, 2200);
+  }
+
+  /* ============================================================
+     ذخیره / بارگذاری
+     ============================================================ */
+  function persistNow(){
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        reportDate: state.reportDate,
+        carKm: state.carKm,
+        team: state.team,
+        jobs: state.jobs
+      }));
+      localStorage.setItem(LS_HISTORY, JSON.stringify(history));
+      localStorage.setItem(LS_OPTS, JSON.stringify(optionalState));
+      localStorage.setItem(LS_TYPES, JSON.stringify(customTypes));
+      localStorage.setItem(LS_FIELDS, JSON.stringify(customFields));
+    } catch(e){}
+  }
+  var persistTimer = null;
+  function persist(){
+    if (persistTimer) return;
+    persistTimer = setTimeout(function(){ persistTimer = null; persistNow(); }, 200);
+  }
+
+  function migrateJob(j){
+    if (!j || typeof j !== 'object') return j;
+    if (j.pelakUnit !== undefined){
+      if (!j.pelak) j.pelak = j.pelakUnit;
+      if (!j.unit && j.unitVal) j.unit = j.unitVal;
+      delete j.pelakUnit;
+    }
+    if (j.kind) delete j.kind;
+    if (!j.dateKey && j.date){
+      var p = parseJalali(j.date);
+      if (p) j.dateKey = jalaliToKey(p);
+    }
+    return j;
+  }
+
+  function loadAll(){
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if (raw){
+        var p = JSON.parse(raw);
+        if (p && typeof p === 'object'){
+          state.reportDate = p.reportDate || '';
+          state.carKm = p.carKm || '';
+          state.team  = p.team  || '';
+          state.jobs  = Array.isArray(p.jobs) ? p.jobs.map(migrateJob) : [];
+        }
+      }
+      var h = localStorage.getItem(LS_HISTORY);
+      if (h){
+        var hp = JSON.parse(h);
+        if (Array.isArray(hp)) history = hp;
+      }
+      var o = localStorage.getItem(LS_OPTS);
+      if (o){
+        var op = JSON.parse(o);
+        if (op && typeof op === 'object') optionalState = op;
+      }
+      var t = localStorage.getItem(LS_TYPES);
+      if (t){
+        var tp = JSON.parse(t);
+        if (Array.isArray(tp)){
+          customTypes = tp.filter(function(x){
+            return typeof x === 'string' && x.trim() &&
+                   BASE_TYPES.indexOf(x) === -1 && x !== STATUS_TYPE;
+          });
+        }
+      }
+      var f = localStorage.getItem(LS_FIELDS);
+      if (f){
+        var fp = JSON.parse(f);
+        if (Array.isArray(fp)){
+          customFields = fp.filter(function(x){
+            return x && typeof x === 'object' && x.id && x.label;
+          }).map(function(x){
+            var grp = String(x.group || 'custom');
+            if (ALLOWED_GROUPS.indexOf(grp) === -1) grp = 'custom';
+            return {
+              id: 'c' + x.id,
+              label: String(x.label).slice(0, 40),
+              sticker: String(x.sticker || '✨').slice(0, 4),
+              group: grp,
+              pair: false,
+              isCustom: true
+            };
+          });
+        }
+      }
+      ensureOptionalState();
+    } catch(e){}
+  }
+
+  function ensureOptionalState(){
+    var all = allFields();
+    for (var i=0; i<all.length; i++){
+      if (typeof optionalState[all[i].id] !== 'boolean'){
+        optionalState[all[i].id] = false;
+      }
+    }
+  }
+
+  /* ============================================================
+     تم
+     ============================================================ */
+  function applyTheme(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    var lb = $('themeBtnLanding'); if (lb) lb.textContent = theme === 'dark' ? '☀' : '◐';
+    var ab = $('themeBtn'); if (ab) ab.textContent = theme === 'dark' ? '☀' : '◐';
+    var hb = $('themeBtnHistory'); if (hb) hb.textContent = theme === 'dark' ? '☀' : '◐';
+    var nb = $('themeBtnAnalytics'); if (nb) nb.textContent = theme === 'dark' ? '☀' : '◐';
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute('content', theme === 'dark' ? '#0b1017' : '#1e293b');
+    try { localStorage.setItem(LS_THEME, theme); } catch(e){}
+    if (typeof drawChart === 'function') drawChart();
+  }
+  function initTheme(){
+    var saved = null;
+    try { saved = localStorage.getItem(LS_THEME); } catch(e){}
+    if (!saved){
+      saved = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        ? 'dark' : 'light';
+    }
+    applyTheme(saved);
+  }
+
+  /* ============================================================
+     توابع کمکی کارها
+     ============================================================ */
+  function getJob(id){
+    for (var i=0; i<state.jobs.length; i++) if (state.jobs[i].id === id) return state.jobs[i];
+    return null;
+  }
+  function countByType(type){
+    if (!type) return state.jobs.length;
+    var n = 0;
+    for (var i=0; i<state.jobs.length; i++) if (state.jobs[i].type === type) n++;
+    return n;
+  }
+  function scopedJobsSorted(){
+    var list = exportScope
+      ? state.jobs.filter(function(j){ return j.type === exportScope; })
+      : state.jobs.slice();
+    return list.sort(function(a, b){
+      var ra = typeRank(a.type), rb = typeRank(b.type);
+      if (ra !== rb) return ra - rb;
+      return (a.createdAt || 0) - (b.createdAt || 0);
+    });
+  }
+  function isCustomType(t){ return customTypes.indexOf(t) !== -1; }
+  function typeSticker(t){ return TYPE_STICKER[t] || '✨'; }
+  function typeClass(t){
+    if (isCustomType(t)) return 'tc';
+    return {'FTTH':'t1','Swap':'t2','بسترسازی':'t3','خرابی':'t4','تعیین وضعیت':'t5'}[t] || 't1';
+  }
+  function typeRank(t){
+    var i = BASE_TYPES.indexOf(t);
+    if (i !== -1) return i;
+    if (t === STATUS_TYPE) return 1000;
+    var ci = customTypes.indexOf(t);
+    if (ci !== -1) return 100 + ci;
+    return 500;
+  }
+
+  /* لیست همه‌ی انواع به ترتیب (پایه + سفارشی + تعیین وضعیت) */
+  function allOrderedTypes(){
+    var arr = BASE_TYPES.slice();
+    for (var i=0; i<customTypes.length; i++) arr.push(customTypes[i]);
+    arr.push(STATUS_TYPE);
+    return arr;
+  }
+
+  /* ============================================================
+     تاریخچه
+     ============================================================ */
+  function groupJobsByDate(){
+    var map = {};
+    for (var i=0; i<state.jobs.length; i++){
+      var j = state.jobs[i];
+      var k = dayKeyOfJob(j);
+      if (!k) continue;
+      if (!map[k]) map[k] = [];
+      map[k].push(j);
+    }
+    for (var h=0; h<history.length; h++){
+      var rec = history[h];
+      if (!rec || !rec.dateKey) continue;
+      if (!map[rec.dateKey]) map[rec.dateKey] = [];
+      if (Array.isArray(rec.jobs)){
+        for (var jj=0; jj<rec.jobs.length; jj++){
+          map[rec.dateKey].push(rec.jobs[jj]);
+        }
+      }
+    }
+    return map;
+  }
+
+  function daysWithJobsInMonth(jy, jm){
+    var map = groupJobsByDate();
+    var days = {};
+    for (var k in map){
+      if (!map.hasOwnProperty(k)) continue;
+      var p = k.split('/');
+      if (+p[0] === jy && +p[1] === jm && map[k].length){
+        days[+p[2]] = map[k].length;
+      }
+    }
+    return days;
+  }
+
+  /* ============================================================
+     SCREEN ROUTER
+     ============================================================ */
+  var SCREEN_ROUTES = {
+    '': 'landing',
+    '#home': 'landing',
+    '#report': 'reportApp',
+    '#history': 'historyScreen',
+    '#analytics': 'analyticsScreen'
+  };
+
+  function currentScreenId(){
+    var screens = document.querySelectorAll('.screen');
+    for (var i=0; i<screens.length; i++){
+      if (screens[i].classList.contains('active')) return screens[i].id;
+    }
+    return 'landing';
+  }
+
+  function showScreen(id, updateHistory){
+    var screens = document.querySelectorAll('.screen');
+    for (var i=0; i<screens.length; i++){
+      screens[i].classList.toggle('active', screens[i].id === id);
+    }
+    window.scrollTo(0, 0);
+
+    if (updateHistory !== false && window.history && window.history.pushState){
+      var hash = '#home';
+      if (id === 'reportApp') hash = '#report';
+      else if (id === 'historyScreen') hash = '#history';
+      else if (id === 'analyticsScreen') hash = '#analytics';
+      if (window.location.hash !== hash){
+        try { window.history.pushState({ screen: id }, '', hash); } catch(e){}
+      }
+    }
+
+    if (id === 'historyScreen' && typeof renderCalendar === 'function') renderCalendar();
+    if (id === 'analyticsScreen' && typeof renderAnalytics === 'function') renderAnalytics();
+  }
+
+  function navigateTo(id){
+    var current = currentScreenId();
+    if (current === id) return;
+    showScreen(id, true);
+  }
+
+  function initFromHash(){
+    var hash = window.location.hash || '';
+    var screenId = SCREEN_ROUTES[hash] || 'landing';
+    showScreen(screenId, false);
+  }
+
+  window.addEventListener('popstate', function(){
+    var hash = window.location.hash || '';
+    var screenId = SCREEN_ROUTES[hash] || 'landing';
+    showScreen(screenId, false);
+  });
+
+  /* ============================================================
+     رندر لیست کارها (بدون نمایش تگ در کارت‌های داخلی)
+     ============================================================ */
+  function jobCardHTML(j){
+    var isStatus = j.type === STATUS_TYPE;
+    var isCustom = isCustomType(j.type);
+    var title = (j.address || j.name || 'بدون عنوان');
+
+    var sub = [];
+    if (!isStatus && !isCustom){
+      if (j.pelak) sub.push('پلاک ' + j.pelak);
+      if (j.unit)  sub.push('واحد ' + j.unit);
+      if (j.name)  sub.push(j.name);
+      if (j.mobile) sub.push(j.mobile);
+    } else if (j.name){
+      sub.push('مشتری: ' + j.name);
+    }
+
+    var tags = '';
+    tags += '<span class="tag tag-accent">' + esc(j.type || '—') + '</span>';
+    if (j.hasMini && !isStatus) tags += '<span class="tag">مینی</span>';
+    if (j.hasDesc) tags += '<span class="tag">توضیحات</span>';
+
+    return '<article class="job-card" data-id="' + esc(j.id) + '">' +
+        '<div class="job-card-head">' +
+          '<div class="job-card-meta">' + tags + '</div>' +
+          '<span class="job-card-date">' + esc(state.reportDate || '') + '</span>' +
+        '</div>' +
+        '<h3 class="job-card-title">' + esc(title) + '</h3>' +
+        (sub.length ? '<p class="job-card-sub">' + esc(sub.join(' • ')) + '</p>' : '') +
+        '<div class="job-card-actions">' +
+          '<button class="btn btn-sm btn-ghost" type="button" data-act="edit">ویرایش</button>' +
+          '<button class="btn btn-sm btn-danger" type="button" data-act="del">حذف</button>' +
+        '</div>' +
+      '</article>';
+  }
+
+  function updateCountsUI(){
+    var chips = document.querySelectorAll('#quickExportGrid .chip');
+    for (var i=0; i<chips.length; i++){
+      var t = chips[i].getAttribute('data-type');
+      var c = chips[i].querySelector('.chip-count');
+      if (c) c.textContent = toFa(countByType(t));
+    }
+    var scChips = document.querySelectorAll('#exportScopeGrid .scope-chip');
+    for (var s=0; s<scChips.length; s++){
+      var t2 = scChips[s].getAttribute('data-scope');
+      var c2 = scChips[s].querySelector('.sc-num');
+      if (c2) c2.textContent = toFa(countByType(t2));
+      scChips[s].classList.toggle('active', t2 === exportScope);
+    }
+  }
+
+  function render(){
+    var q  = ($('search').value || '').trim().toLowerCase();
+    var ft = $('filterType').value;
+
+    $('count').textContent = toFa(state.jobs.length);
+
+    var list = state.jobs.filter(function(j){
+      if (ft && j.type !== ft) return false;
+      if (q){
+        var hay = [j.address, j.name, j.pelak, j.unit, j.odc, j.fat, j.mini,
+                   j.mobile, j.phone, j.virtual, j.desc, j.type]
+          .filter(Boolean).join(' ').toLowerCase();
+        for (var ci=0; ci<customFields.length; ci++){
+          var cv = j['cf_' + customFields[ci].id];
+          if (cv) hay += ' ' + String(cv).toLowerCase();
+        }
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+    list.reverse();
+
+    var el = $('jobList');
+    var empty = $('emptyState');
+
+    if (!state.jobs.length){
+      el.innerHTML = '';
+      empty.hidden = false;
+      empty.innerHTML = '<div class="es-mark">◇</div><p>هیچ کاری ثبت نشده است</p><p class="muted">برای شروع، روی «افزودن کار جدید» بزنید</p>';
+      lastIdsKey = '';
+      updateCountsUI();
+      updateDashboard();
+      return;
+    }
+    if (!list.length){
+      el.innerHTML = '';
+      empty.hidden = false;
+      empty.innerHTML = '<div class="es-mark">◇</div><p>نتیجه‌ای یافت نشد</p><p class="muted">عبارت جستجو یا فیلتر را تغییر دهید</p>';
+      lastIdsKey = '';
+      updateCountsUI();
+      updateDashboard();
+      return;
+    }
+    empty.hidden = true;
+
+    var key = list.map(function(j){ return j.id; }).join('|');
+    if (key !== lastIdsKey){
+      lastIdsKey = key;
+      var html = '';
+      for (var i=0; i<list.length; i++) html += jobCardHTML(list[i]);
+      el.innerHTML = html;
+    }
+    updateCountsUI();
+    updateDashboard();
+  }
+
+  /* ============================================================
+     داشبورد — داینامیک (همه‌ی انواع)
+     ============================================================ */
+  var dashCache = { lastSignature: '' };
+  function updateDashboard(){
+    var jobs = state.jobs;
+    var total = jobs.length;
+
+    var sig = total + '|' + (state.reportDate || '') + '|' + customTypes.join(',') + '|';
+    for (var s=0; s<Math.min(jobs.length, 5); s++){
+      sig += jobs[s].id + ':' + jobs[s].type + ';';
+    }
+    if (sig === dashCache.lastSignature) return;
+    dashCache.lastSignature = sig;
+
+    $('dashTotal').textContent = toFa(total);
+    var today = state.reportDate || '';
+    $('dashToday').textContent = toFa(today ? total : 0);
+
+    var typeCounts = {};
+    for (var k=0; k<jobs.length; k++){
+      var t = jobs[k].type || '—';
+      typeCounts[t] = (typeCounts[t] || 0) + 1;
+    }
+    var ordered = allOrderedTypes();
+
+    var activeTypes = 0;
+    for (var a=0; a<ordered.length; a++){
+      if (typeCounts[ordered[a]]) activeTypes++;
+    }
+    $('dashTypes').textContent = toFa(activeTypes);
+
+    var barsBox = $('dashBars');
+    var totalBox = $('dashBreakdownTotal');
+    if (!total){
+      totalBox.textContent = '۰ مورد';
+      barsBox.innerHTML = '<div class="dash-empty">هنوز کاری ثبت نشده است</div>';
+    } else {
+      totalBox.textContent = toFa(total) + ' مورد';
+      var html = '';
+      var maxCount = 0;
+      for (var m=0; m<ordered.length; m++){
+        if (typeCounts[ordered[m]] > maxCount) maxCount = typeCounts[ordered[m]];
+      }
+      for (var n=0; n<ordered.length; n++){
+        var tt = ordered[n];
+        var cc = typeCounts[tt] || 0;
+        if (!cc) continue;
+        var pct = maxCount ? Math.round((cc / maxCount) * 100) : 0;
+        var cls = (tt === STATUS_TYPE) ? 't5' : (isCustomType(tt) ? 'tc' : typeClass(tt));
+        html +=
+          '<div class="dash-bar ' + cls + '">' +
+            '<span class="db-label">' + esc(tt) + '</span>' +
+            '<span class="db-track"><span class="db-fill" style="width:' + pct + '%"></span></span>' +
+            '<span class="db-count">' + toFa(cc) + '</span>' +
+          '</div>';
+      }
+      barsBox.innerHTML = html;
+    }
+
+    var recentBox = $('dashRecentList');
+    if (!total){
+      recentBox.innerHTML = '<div class="dash-recent-empty">هنوز کاری ثبت نشده است</div>';
+    } else {
+      var rList = jobs.slice().sort(function(a, b){
+        return (b.createdAt || 0) - (a.createdAt || 0);
+      }).slice(0, 3);
+      var rhtml = '';
+      for (var r=0; r<rList.length; r++){
+        var jj = rList[r];
+        var ttl = jj.address || jj.name || 'بدون عنوان';
+        rhtml +=
+          '<div class="dash-recent-item">' +
+            '<span class="dr-title">' + esc(ttl) + '</span>' +
+            '<span class="dr-badge">' + esc(jj.type || '—') + '</span>' +
+          '</div>';
+      }
+      recentBox.innerHTML = rhtml;
+    }
+  }
+
+  /* ============================================================
+     بازسازی چیپس‌ها و فیلترها — داینامیک
+     ============================================================ */
+  function rebuildAllUIs(){
+    var ordered = allOrderedTypes();
+
+    var quick = $('quickExportGrid');
+    if (quick){
+      var html = '<button class="chip chip-all" data-type="" type="button">همه<span class="chip-count">0</span></button>';
+      for (var i=0; i<ordered.length; i++){
+        var tt = ordered[i];
+        html += '<button class="chip" data-type="' + esc(tt) + '" type="button">' + typeSticker(tt) + ' ' + esc(tt) + '<span class="chip-count">0</span></button>';
+      }
+      quick.innerHTML = html;
+    }
+
+    var scope = $('exportScopeGrid');
+    if (scope){
+      var sh = '<button class="scope-chip active" data-scope="" type="button">همه<span class="sc-num">0</span></button>';
+      for (var k=0; k<ordered.length; k++){
+        var tk = ordered[k];
+        sh += '<button class="scope-chip" data-scope="' + esc(tk) + '" type="button">' + typeSticker(tk) + ' ' + esc(tk) + '<span class="sc-num">0</span></button>';
+      }
+      scope.innerHTML = sh;
+    }
+
+    var ft = $('filterType');
+    if (ft){
+      var fh = '<option value="">همه انواع</option>';
+      for (var f=0; f<ordered.length; f++){
+        fh += '<option value="' + esc(ordered[f]) + '">' + esc(ordered[f]) + '</option>';
+      }
+      ft.innerHTML = fh;
+    }
+
+    bindQuickExportEvents();
+    bindScopeEvents();
+  }
+
+  function bindQuickExportEvents(){
+    var btns = document.querySelectorAll('#quickExportGrid .chip');
+    for (var i=0; i<btns.length; i++){
+      (function(b){
+        b.addEventListener('click', function(){
+          var t = b.getAttribute('data-type') || '';
+          exportScope = t;
+          openExport(t);
+        });
+      })(btns[i]);
+    }
+  }
+  function bindScopeEvents(){
+    var btns = document.querySelectorAll('#exportScopeGrid .scope-chip');
+    for (var i=0; i<btns.length; i++){
+      (function(b){
+        b.addEventListener('click', function(){
+          var t = b.getAttribute('data-scope') || '';
+          setExportScope(t);
+        });
+      })(btns[i]);
+    }
+  }
+
+  /* ============================================================
+     انواع سفارشی
+     ============================================================ */
+  function renderCustomTypeTiles(){
+    var old = document.querySelectorAll('#typeGrid .custom-type');
+    for (var i=0; i<old.length; i++) old[i].remove();
+
+    var grid = $('typeGrid');
+    var addBtn = $('addCustomTypeBtn');
+
+    for (var j=0; j<customTypes.length; j++){
+      var t = customTypes[j];
+      var el = document.createElement('div');
+      el.className = 'type-item custom-type';
+      el.setAttribute('data-type', t);
+      el.setAttribute('role', 'button');
+      el.setAttribute('tabindex', '0');
+      el.innerHTML =
+        '<button class="type-remove" data-remove-custom="' + esc(t) + '" type="button" aria-label="حذف">✕</button>' +
+        '<span><span class="ti-name">' + esc(t) + '</span><span class="ti-sub">سفارشی</span></span>';
+      grid.insertBefore(el, addBtn);
+    }
+
+    var tiles = grid.querySelectorAll('.type-item');
+    for (var k=0; k<tiles.length; k++){
+      (function(tile){
+        tile.addEventListener('click', function(e){
+          if (e.target && e.target.closest('[data-remove-custom]')) return;
+          selectType(tile.getAttribute('data-type'));
+        });
+      })(tiles[k]);
+    }
+    var rems = grid.querySelectorAll('[data-remove-custom]');
+    for (var r=0; r<rems.length; r++){
+      (function(btn){
+        btn.addEventListener('click', function(e){
+          e.stopPropagation();
+          var name = btn.getAttribute('data-remove-custom');
+          if (confirm('نوع «' + name + '» حذف شود؟')){
+            customTypes = customTypes.filter(function(x){ return x !== name; });
+            if (exportScope === name) exportScope = '';
+            if (currentType === name) currentType = 'FTTH';
+            persistNow();
+            rebuildAllUIs();
+            renderCustomTypeTiles();
+            markTypeTiles();
+            updateTypeVisibility();
+            render();
+            toast('نوع حذف شد');
+          }
+        });
+      })(rems[r]);
+    }
+  }
+
+  function markTypeTiles(){
+    var tiles = document.querySelectorAll('#typeGrid .type-item');
+    for (var i=0; i<tiles.length; i++){
+      var t = tiles[i].getAttribute('data-type');
+      tiles[i].classList.toggle('active', t === currentType);
+    }
+  }
+
+  function selectType(t){
+    currentType = t;
+    persist();
+    markTypeTiles();
+    updateTypeVisibility();
+    formDirty = true;
+  }
+
+  /* ============================================================
+     فیلدهای اختیاری
+     ============================================================ */
+  function renderOptionalTiles(){
+    var grid = $('optsGrid');
+    if (!grid) return;
+    var html = '';
+
+    var all = allFields();
+    for (var i=0; i<all.length; i++){
+      var f = all[i];
+      var on = !!optionalState[f.id];
+      var isCustom = !!f.isCustom;
+      var displayLabel = (f.sticker ? f.sticker + ' ' : '') + f.label;
+
+      html +=
+        '<button class="opt-item' + (on ? ' active' : '') + (isCustom ? ' is-custom' : '') + '" data-opt="' + f.id + '" type="button">' +
+          '<span class="oi-label">' + esc(displayLabel) + '</span>' +
+          (isCustom ? '<span class="oi-remove" data-remove-field="' + f.id + '" role="button" aria-label="حذف">✕</span>' : '') +
+          '<span class="oi-switch"></span>' +
+        '</button>';
+    }
+
+    html +=
+      '<button class="opts-add" id="addCustomFieldBtn" type="button">' +
+        '<span>+</span> افزودن فیلد جدید' +
+      '</button>';
+
+    grid.innerHTML = html;
+
+    var tiles = grid.querySelectorAll('.opt-item');
+    for (var t=0; t<tiles.length; t++){
+      (function(tile){
+        tile.addEventListener('click', function(e){
+          if (e.target && e.target.closest('[data-remove-field]')) return;
+          toggleOptional(tile.getAttribute('data-opt'));
+        });
+      })(tiles[t]);
+    }
+
+    var rems = grid.querySelectorAll('[data-remove-field]');
+    for (var r=0; r<rems.length; r++){
+      (function(btn){
+        btn.addEventListener('click', function(e){
+          e.stopPropagation();
+          var id = btn.getAttribute('data-remove-field');
+          var field = getFieldById(id);
+          if (!field) return;
+          if (!confirm('فیلد «' + field.label + '» حذف شود؟\n(مقادیر ثبت‌شده‌ی قبلی در کارها حفظ می‌شوند.)')) return;
+
+          customFields = customFields.filter(function(x){ return x.id !== id; });
+          delete optionalState[id];
+          persistNow();
+
+          renderOptionalTiles();
+          renderDynamicFields();
+          applyOptionalState();
+          toast('فیلد حذف شد');
+        });
+      })(rems[r]);
+    }
+
+    var addBtn = $('addCustomFieldBtn');
+    if (addBtn) addBtn.addEventListener('click', openCustomFieldModal);
+  }
+
+  /* ============================================================
+     فیلدهای داینامیک (فرم)
+     ============================================================ */
+  function renderDynamicFields(){
+    var host = $('dynamicFieldsHost');
+    if (!host) return;
+    var html = '';
+
+    var groups = [
+      { key:'cable-info',   title:'اطلاعات کابل',   meta:'فنی' },
+      { key:'customer',     title:'اطلاعات مشتری', meta:'مشتری' },
+      { key:'cable-specs',  title:'مشخصات کابل',   meta:'فنی' },
+      { key:'contact',      title:'اطلاعات تماس',  meta:'مخاطب' },
+      { key:'optional',     title:'اختیاری',       meta:'دلخواه' },
+      { key:'custom',       title:'سفارشی',        meta:'دلخواه' }
+    ];
+
+    var all = allFields();
+    var editingJob = editingId ? getJob(editingId) : null;
+
+    for (var g=0; g<groups.length; g++){
+      var grp = groups[g];
+      var groupFields = all.filter(function(f){ return f.group === grp.key; });
+      if (!groupFields.length) continue;
+
+      var body = '';
+      for (var i=0; i<groupFields.length; i++){
+        var f = groupFields[i];
+        var on = !!optionalState[f.id];
+        var inputCls = 'input';
+
+        var curVal = '';
+        var curVal2 = '';
+        if (editingJob){
+          if (f.isCustom){
+            curVal = editingJob['cf_' + f.id] || '';
+          } else {
+            curVal = editingJob[f.id] || '';
+            if (f.extra) curVal2 = editingJob[f.extra] || '';
+          }
+        }
+
+        if (f.pair){
+          var extra = f.extra || 'extra';
+          body +=
+            '<div class="dyn-field' + (on ? ' is-on' : '') + '" data-field="' + f.id + '">' +
+              '<div class="dyn-field-label"><span>' + esc(f.label) + '</span><span class="dyn-field-toggle">' + (on ? 'فعال' : 'غیرفعال') + '</span></div>' +
+              '<div class="field-pair">' +
+                '<input id="fld_' + f.id + '" name="' + f.id + '" class="' + inputCls + '" type="text" placeholder="شروع" value="' + esc(curVal) + '" />' +
+                '<input id="fld_' + extra + '" name="' + extra + '" class="' + inputCls + '" type="text" placeholder="پایان" value="' + esc(curVal2) + '" />' +
+              '</div>' +
+            '</div>';
+        } else {
+          body +=
+            '<div class="dyn-field' + (on ? ' is-on' : '') + '" data-field="' + f.id + '">' +
+              '<div class="dyn-field-label"><span>' + (f.sticker ? f.sticker + ' ' : '') + esc(f.label) + '</span><span class="dyn-field-toggle">' + (on ? 'فعال' : 'غیرفعال') + '</span></div>' +
+              '<input id="fld_' + f.id + '" name="' + f.id + '" class="' + inputCls + '" type="text" placeholder="' + esc(f.label) + '" value="' + esc(curVal) + '" />' +
+            '</div>';
+        }
+      }
+
+      html +=
+        '<section class="form-section" data-group="' + grp.key + '">' +
+          '<div class="form-section-head">' +
+            '<h3>' + esc(grp.title) + '</h3>' +
+            '<span class="fs-meta">' + esc(grp.meta) + '</span>' +
+          '</div>' +
+          '<div class="form-body">' + body + '</div>' +
+        '</section>';
+    }
+
+    host.innerHTML = html;
+    attachDynamicListeners();
+  }
+
+  function updateTypeVisibility(){
+    var isStatus = currentType === STATUS_TYPE;
+    var sections = document.querySelectorAll('#dynamicFieldsHost .form-section');
+    for (var i=0; i<sections.length; i++){
+      var grp = sections[i].getAttribute('data-group');
+      var hide = false;
+      if (isStatus && grp !== 'custom' && grp !== 'customer' && grp !== 'optional') hide = true;
+      sections[i].classList.toggle('is-hidden', hide);
+    }
+
+    ensureOptionalState();
+
+    if (isStatus){
+      var offIds = ['odc','fat','mini','k8s','k2s','phone','virtual','mobile'];
+      var changed = false;
+      for (var k=0; k<offIds.length; k++){
+        if (optionalState[offIds[k]]){ optionalState[offIds[k]] = false; changed = true; }
+      }
+      if (changed){ persist(); }
+      renderOptionalTiles();
+      renderDynamicFields();
+    }
+  }
+
+  function applyOptionalState(){
+    var tiles = document.querySelectorAll('#optsGrid .opt-item');
+    for (var i=0; i<tiles.length; i++){
+      var key = tiles[i].getAttribute('data-opt');
+      var on = !!optionalState[key];
+      tiles[i].classList.toggle('active', on);
+    }
+    var fields = document.querySelectorAll('#dynamicFieldsHost .dyn-field');
+    for (var j=0; j<fields.length; j++){
+      var fkey = fields[j].getAttribute('data-field');
+      var on2 = !!optionalState[fkey];
+      fields[j].classList.toggle('is-on', on2);
+      var tg = fields[j].querySelector('.dyn-field-toggle');
+      if (tg) tg.textContent = on2 ? 'فعال' : 'غیرفعال';
+    }
+  }
+  function toggleOptional(key){
+    optionalState[key] = !optionalState[key];
+    applyOptionalState();
+    persist();
+    formDirty = true;
+  }
+
+  /* ============================================================
+     تگ‌گذاری در فرم
+     ============================================================ */
+  function renderTagFormUI(){
+    var grid = $('tagFormGrid');
+    if (!grid) return;
+    var btns = grid.querySelectorAll('.tag-form-choice');
+    for (var i=0; i<btns.length; i++){
+      var t = btns[i].getAttribute('data-tag');
+      btns[i].classList.toggle('active', t === currentFormTag);
+    }
+    var cur = $('tagFormCurrent');
+    if (cur) cur.textContent = tagLabel(currentFormTag);
+  }
+
+  function setFormTag(t){
+    if (TAGS[t]) currentFormTag = t;
+    renderTagFormUI();
+    formDirty = true;
+  }
+
+  /* ============================================================
+     فرم کار
+     ============================================================ */
+  var overlay = $('formOverlay');
+  var formEl  = $('jobForm');
+
+  function updateDescVisibility(){ $('descWrap').classList.toggle('open', $('hasDesc').checked); }
+
+  function fillForm(job){
+    formEl.reset();
+
+    if (job){
+      currentType = job.type;
+      currentFormTag = job.tag || 'done';
+      if (BASE_TYPES.indexOf(currentType) === -1
+          && currentType !== STATUS_TYPE
+          && customTypes.indexOf(currentType) === -1){
+        currentType = 'FTTH';
+      }
+    } else if (BASE_TYPES.indexOf(currentType) === -1
+        && currentType !== STATUS_TYPE
+        && customTypes.indexOf(currentType) === -1){
+      currentType = 'FTTH';
+    }
+
+    if (!job){
+      currentFormTag = 'done';
+    }
+
+    if (job){
+      optionalState.odc       = !!(job.odc);
+      optionalState.fat       = !!(job.fat);
+      optionalState.mini      = !!job.hasMini || !!(job.mini);
+      optionalState.address   = !!(job.address);
+      optionalState.pelak     = !!(job.pelak);
+      optionalState.unit      = !!(job.unit);
+      optionalState.name      = !!(job.name);
+      optionalState.k8s       = !!(job.k8s || job.k8e);
+      optionalState.k2s       = !!(job.k2s || job.k2e);
+      optionalState.phone     = !!(job.phone);
+      optionalState.virtual   = !!(job.virtual);
+      optionalState.mobile    = !!(job.mobile);
+      for (var c2=0; c2<customFields.length; c2++){
+        var cf2 = customFields[c2];
+        optionalState[cf2.id] = !!job['cf_' + cf2.id];
+      }
+    }
+
+    renderOptionalTiles();
+    renderDynamicFields();
+    applyOptionalState();
+    updateDescVisibility();
+    updateTypeVisibility();
+    markTypeTiles();
+    renderTagFormUI();
+
+    $('hasDesc').checked = job ? !!job.hasDesc : false;
+    updateDescVisibility();
+  }
+
+  function attachDynamicListeners(){
+    var inputs = formEl.querySelectorAll('input, textarea, select');
+    for (var i=0; i<inputs.length; i++){
+      if (inputs[i].__dirtyBound) continue;
+      inputs[i].__dirtyBound = true;
+      inputs[i].addEventListener('input', function(){ formDirty = true; });
+      inputs[i].addEventListener('change', function(){ formDirty = true; });
+    }
+  }
+
+  function openForm(job){
+    editingId = job ? job.id : null;
+    $('formTitle').textContent = job ? 'ویرایش کار' : 'کار جدید';
+    $('formSub').textContent = job ? 'اطلاعات را ویرایش کنید' : 'اطلاعات مورد نیاز را تکمیل کنید';
+    fillForm(job || null);
+    formDirty = false;
+    overlay.hidden = false;
+    document.body.classList.add('no-scroll');
+    requestAnimationFrame(function(){ overlay.classList.add('show'); });
+    var body = overlay.querySelector('.sheet-body');
+    if (body) body.scrollTop = 0;
+  }
+
+  function closeForm(force){
+    if (!force && formDirty){
+      if (!confirm('اطلاعات فرم ذخیره نشده است. خارج می‌شوید؟')) return;
+    }
+    overlay.classList.remove('show');
+    document.body.classList.remove('no-scroll');
+    formDirty = false;
+    setTimeout(function(){ if (!overlay.classList.contains('show')) overlay.hidden = true; }, 240);
+  }
+
+  function readForm(){
+    function v(name){
+      var el = formEl.elements[name];
+      return el && typeof el.value === 'string' ? el.value.trim() : '';
+    }
+    var isStatus = currentType === STATUS_TYPE;
+    var hasDesc = $('hasDesc').checked;
+
+    function ov(key, name){
+      if (!optionalState[key]) return '';
+      return v(name);
+    }
+
+    var data = {
+      type: currentType,
+      tag: currentFormTag,
+      odc:     isStatus ? '' : ov('odc','odc'),
+      fat:     isStatus ? '' : ov('fat','fat'),
+      hasMini: isStatus ? false : optionalState.mini,
+      mini:    (isStatus || !optionalState.mini) ? '' : v('mini'),
+      address: isStatus ? '' : ov('address','address'),
+      pelak:   isStatus ? '' : ov('pelak','pelak'),
+      unit:    isStatus ? '' : ov('unit','unit'),
+      k8s:     isStatus ? '' : ov('k8s','k8s'),
+      k8e:     isStatus ? '' : ov('k8s','k8e'),
+      k2s:     isStatus ? '' : ov('k2s','k2s'),
+      k2e:     isStatus ? '' : ov('k2s','k2e'),
+      phone:   isStatus ? '' : ov('phone','phone'),
+      virtual: isStatus ? '' : ov('virtual','virtual'),
+      mobile:  isStatus ? '' : ov('mobile','mobile'),
+      name:    ov('name','name'),
+      hasDesc: hasDesc,
+      desc:    hasDesc ? v('desc') : ''
+    };
+
+    for (var c=0; c<customFields.length; c++){
+      var cf = customFields[c];
+      var key = 'cf_' + cf.id;
+      if (optionalState[cf.id]){
+        var el = document.getElementById('fld_' + cf.id);
+        data[key] = el ? (el.value || '').trim() : '';
+      } else {
+        data[key] = '';
+      }
+    }
+
+    return data;
+  }
+
+  function saveJob(addNext){
+    var data = readForm();
+    var today = parseJalali(state.reportDate) || todayJalali();
+    data.date = jalaliToFa(today);
+    data.dateKey = jalaliToKey(today);
+
+    if (editingId){
+      for (var i=0; i<state.jobs.length; i++){
+        if (state.jobs[i].id === editingId){
+          state.jobs[i] = Object.assign({}, state.jobs[i], data);
+          break;
+        }
+      }
+    } else {
+      state.jobs.push(Object.assign({ id: uid(), createdAt: Date.now() }, data));
+    }
+    persistNow();
+    lastIdsKey = '';
+    render();
+    formDirty = false;
+    toast('کار با موفقیت ثبت شد');
+
+    if (addNext){
+      editingId = null;
+      $('formTitle').textContent = 'کار جدید';
+      $('formSub').textContent = 'اطلاعات مورد نیاز را تکمیل کنید';
+      fillForm(null);
+      var body = overlay.querySelector('.sheet-body');
+      if (body) body.scrollTop = 0;
+    } else {
+      closeForm(true);
+    }
+  }
+
+  /* ============================================================
+     ساخت متن خروجی (بدون تگ)
+     ============================================================ */
+  function stickerOfField(f){ return f.sticker || '✨'; }
+
+  function buildBlock(j){
+    var L = [];
+    var all = allFields();
+
+    for (var i=0; i<all.length; i++){
+      var f = all[i];
+      var sticker = stickerOfField(f);
+
+      if (f.pair){
+        var v1 = j[f.id] || '';
+        var v2 = j[f.extra] || '';
+        if (!v1 && !v2) continue;
+        if (f.id === 'k8s'){
+          if (v1) L.push(sticker + ' شروع کابل ۸ کر: ' + v1);
+          if (v2) L.push(sticker + ' پایان کابل ۸ کر: ' + v2);
+        } else if (f.id === 'k2s'){
+          if (v1) L.push(sticker + ' شروع کابل ۲ کر: ' + v1);
+          if (v2) L.push(sticker + ' پایان کابل ۲ کر: ' + v2);
+        } else {
+          if (v1) L.push(sticker + ' ' + f.label + ': ' + v1);
+          if (v2) L.push(sticker + ' ' + f.label + ' (دوم): ' + v2);
+        }
+      } else {
+        var val = '';
+        if (f.isCustom){
+          val = j['cf_' + f.id] || '';
+        } else if (f.id === 'mini'){
+          if (j.hasMini) L.push(sticker + ' mini: ' + (j.mini || ''));
+          continue;
+        } else {
+          val = j[f.id] || '';
+        }
+        if (!val) continue;
+        var label = f.label;
+        if (f.id === 'odc') label = 'odc';
+        else if (f.id === 'fat') label = 'FAT';
+        else if (f.id === 'address') label = 'ادرس';
+        else if (f.id === 'pelak') label = 'پلاک';
+        else if (f.id === 'unit') label = 'واحد';
+        else if (f.id === 'phone') label = 'تلفن ثابت';
+        else if (f.id === 'virtual') label = 'شماره مجازی';
+        else if (f.id === 'mobile') label = 'تلفن همراه';
+        else if (f.id === 'name') label = 'نام و نام خانوادگی';
+        L.push(sticker + ' ' + label + ': ' + val);
+      }
+    }
+
+    if (j.hasDesc && j.desc) L.push('💬 توضیحات: ' + j.desc);
+    return L.join('\n');
+  }
+
+  function sep(n){ return new Array(n + 1).join('\n'); }
+  function headerLabel(type){ return typeSticker(type) + ' ' + type; }
+
+  function includeMetaChecked(){
+    var el = $('includeMeta');
+    return el ? el.checked : true;
+  }
+
+  function buildExport(){
+    var ordered = scopedJobsSorted();
+    var header = '📅 تاریخ ' + (state.reportDate || '');
+    if (exportScope) header += '\n\n\n' + headerLabel(exportScope);
+    var out = header;
+
+    if (ordered.length){
+      if (exportScope){
+        var blocks = [];
+        for (var i=0; i<ordered.length; i++) blocks.push(buildBlock(ordered[i]));
+        out += '\n\n\n' + blocks.join(sep(BLANK_BETWEEN));
+      } else {
+        var currentT = null;
+        for (var k=0; k<ordered.length; k++){
+          var j = ordered[k];
+          if (j.type !== currentT){
+            currentT = j.type;
+            out += '\n\n\n' + headerLabel(currentT);
+          }
+          out += '\n\n' + buildBlock(j);
+        }
+      }
+    }
+
+    if (includeMetaChecked()){
+      out += sep(BLANK_BEFORE_TAIL);
+      out += '🚗 کیلومتر ماشین : ' + (state.carKm || '') + '\n';
+      out += '👥 تیم : ' + (state.team || '');
+    }
+    return out;
+  }
+
+  /* ============================================================
+     خروجی HTML (تصویری/PDF) — بدون تگ
+     ============================================================ */
+  function buildReportHTML(){
+    var ordered = scopedJobsSorted();
+    var includeMeta = includeMetaChecked();
+    var jobsHTML = '';
+    for (var i=0; i<ordered.length; i++){
+      var j = ordered[i];
+      var rows = '';
+
+      function row(sticker, k, v, full){
+        if (v === undefined || v === null || v === '') return '';
+        return '<div class="doc-row' + (full ? ' full' : '') + '">' +
+                 '<span class="doc-k">' + sticker + ' ' + esc(k) + ':</span>' +
+                 '<span class="doc-v">' + esc(v) + '</span>' +
+               '</div>';
+      }
+
+      var all = allFields();
+      for (var fi=0; fi<all.length; fi++){
+        var f = all[fi];
+        var sticker = stickerOfField(f);
+
+        if (f.pair){
+          var v1 = j[f.id] || '';
+          var v2 = j[f.extra] || '';
+          if (f.id === 'k8s'){
+            if (v1) rows += row(sticker, 'شروع کابل ۸ کر', v1);
+            if (v2) rows += row(sticker, 'پایان کابل ۸ کر', v2);
+          } else if (f.id === 'k2s'){
+            if (v1) rows += row(sticker, 'شروع کابل ۲ کر', v1);
+            if (v2) rows += row(sticker, 'پایان کابل ۲ کر', v2);
+          } else {
+            if (v1) rows += row(sticker, f.label, v1);
+            if (v2) rows += row(sticker, f.label + ' (دوم)', v2);
+          }
+        } else {
+          var val = '';
+          if (f.isCustom){
+            val = j['cf_' + f.id] || '';
+          } else if (f.id === 'mini'){
+            if (j.hasMini) rows += row(sticker, 'mini', j.mini);
+            continue;
+          } else {
+            val = j[f.id] || '';
+          }
+          if (!val) continue;
+          var label = f.label;
+          if (f.id === 'odc') label = 'odc';
+          else if (f.id === 'fat') label = 'FAT';
+          else if (f.id === 'address') label = 'ادرس';
+          else if (f.id === 'pelak') label = 'پلاک';
+          else if (f.id === 'unit') label = 'واحد';
+          else if (f.id === 'name') label = 'نام و نام خانوادگی';
+          else if (f.id === 'phone') label = 'تلفن ثابت';
+          else if (f.id === 'virtual') label = 'شماره مجازی';
+          else if (f.id === 'mobile') label = 'تلفن همراه';
+          rows += row(sticker, label, val, (label === 'ادرس' || label === 'نام و نام خانوادگی'));
+        }
+      }
+
+      var descHTML = (j.hasDesc && j.desc)
+        ? '<div class="doc-desc"><b>💬 توضیحات:</b> ' + esc(j.desc) + '</div>' : '';
+
+      jobsHTML +=
+        '<div class="doc-job">' +
+          '<div class="doc-job-head">' +
+            '<span class="doc-badge ' + typeClass(j.type) + '">' + typeSticker(j.type) + ' ' + esc(j.type || '—') + '</span>' +
+            '<span class="doc-idx">#' + toFa(i + 1) + '</span>' +
+          '</div>' +
+          '<div class="doc-job-body">' +
+            (rows ? '<div class="doc-grid">' + rows + '</div>' : '') +
+            descHTML +
+          '</div>' +
+        '</div>';
+    }
+
+    var sectionTitle = exportScope
+      ? 'لیست ' + typeSticker(exportScope) + ' ' + exportScope + ' — ' + toFa(ordered.length) + ' مورد'
+      : 'لیست کارها — ' + toFa(ordered.length) + ' مورد';
+
+    var jobsSection = ordered.length
+      ? '<div class="doc-section-title">' + sectionTitle + '</div>' + jobsHTML
+      : '<div class="doc-section-title">لیست کارها</div><p style="font-size:12px;color:#64748b;">موردی ثبت نشده است.</p>';
+
+    var metaParts = [];
+    metaParts.push('<span>📅 تاریخ: ' + esc(state.reportDate || '—') + '</span>');
+    if (exportScope) metaParts.push('<span>' + typeSticker(exportScope) + ' ' + esc(exportScope) + '</span>');
+    if (includeMeta && state.team)  metaParts.push('<span>👥 تیم: ' + esc(state.team) + '</span>');
+    if (includeMeta && state.carKm) metaParts.push('<span>🚗 کیلومتر: ' + esc(state.carKm) + '</span>');
+
+    var footerHTML = '';
+    if (includeMeta){
+      var fp = [];
+      fp.push('<span>🚗 کیلومتر ماشین: ' + esc(state.carKm || '—') + '</span>');
+      fp.push('<span>👥 تیم: ' + esc(state.team || '—') + '</span>');
+      footerHTML = '<div class="doc-footer">' + fp.join('') + '</div>';
+    }
+
+    return '' +
+      '<div class="doc-head">' +
+        '<div class="doc-title">گزارش روزانه کابل‌کشی فیبر نوری</div>' +
+        '<div class="doc-sub">گزارش کارهای دراپ — نسخه‌ی چاپی</div>' +
+        '<div class="doc-meta">' + metaParts.join('') + '</div>' +
+      '</div>' +
+      '<div class="doc-body">' + jobsSection + '</div>' +
+      footerHTML +
+      '<div class="doc-brand">حقوقن و نشر SeDmAmAd</div>';
+  }
+
+  function refreshPreview(){ $('reportPreview').innerHTML = buildReportHTML(); }  /* ============================================================
+     خروجی: باز کردن، تب‌ها، کپی
+     ============================================================ */
+  var exportOverlay = $('exportOverlay');
+
+  function setExportScope(scope){
+    exportScope = scope || '';
+    var chips = document.querySelectorAll('#exportScopeGrid .scope-chip');
+    for (var i=0; i<chips.length; i++){
+      chips[i].classList.toggle('active', chips[i].getAttribute('data-scope') === exportScope);
+    }
+    $('exportTitle').textContent = exportScope
+      ? 'خروجی ' + typeSticker(exportScope) + ' ' + exportScope
+      : 'خروجی کامل گزارش';
+    $('exportText').value = buildExport();
+    refreshPreview();
+  }
+
+  function openExport(scope){
+    if (typeof scope === 'string') exportScope = scope;
+    $('exportText').value = buildExport();
+    refreshPreview();
+    switchTab('text');
+    updateCountsUI();
+    exportOverlay.hidden = false;
+    document.body.classList.add('no-scroll');
+    requestAnimationFrame(function(){ exportOverlay.classList.add('show'); });
+  }
+  function closeExport(){
+    exportOverlay.classList.remove('show');
+    document.body.classList.remove('no-scroll');
+    setTimeout(function(){ if (!exportOverlay.classList.contains('show')) exportOverlay.hidden = true; }, 240);
+  }
+
+  function switchTab(tab){
+    var tabs = document.querySelectorAll('.tab-btn');
+    for (var i=0; i<tabs.length; i++){
+      tabs[i].classList.toggle('active', tabs[i].getAttribute('data-tab') === tab);
+    }
+    var panels = document.querySelectorAll('.tab-panel');
+    for (var p=0; p<panels.length; p++){
+      panels[p].hidden = panels[p].getAttribute('data-panel') !== tab;
+    }
+    var foot = $('exportFoot');
+    if (tab === 'text'){
+      foot.innerHTML =
+        '<button id="copyBtn" class="btn btn-ghost" type="button">کپی</button>' +
+        '<button id="downloadBtn" class="btn btn-primary" type="button">دریافت / ارسال</button>';
+      $('copyBtn').addEventListener('click', onCopy);
+      $('downloadBtn').addEventListener('click', function(){ askAction('text'); });
+    } else if (tab === 'image'){
+      foot.innerHTML = '<button id="downloadBtn" class="btn btn-primary btn-block" type="button">دریافت / ارسال تصویر</button>';
+      $('downloadBtn').addEventListener('click', function(){ askAction('image'); });
+    } else if (tab === 'pdf'){
+      foot.innerHTML = '<button id="downloadBtn" class="btn btn-primary btn-block" type="button">دریافت / ارسال PDF</button>';
+      $('downloadBtn').addEventListener('click', function(){ askAction('pdf'); });
+    }
+  }
+
+  function copyText(text){
+    if (navigator.clipboard && window.isSecureContext){
+      return navigator.clipboard.writeText(text).then(function(){ return true; })
+        .catch(function(){ return legacyCopy(); });
+    }
+    return Promise.resolve(legacyCopy());
+  }
+  function legacyCopy(){
+    var ta = $('exportText');
+    try {
+      ta.removeAttribute('readonly');
+      ta.focus(); ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      var ok = document.execCommand('copy');
+      ta.setAttribute('readonly', 'readonly');
+      window.getSelection().removeAllRanges();
+      return ok;
+    } catch(e){ ta.setAttribute('readonly', 'readonly'); return false; }
+  }
+  function onCopy(){
+    copyText($('exportText').value).then(function(ok){
+      toast(ok ? 'در کلیپ‌بورد کپی شد' : 'کپی نشد');
+    });
+  }
+
+  function downloadBlob(blob, filename){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+  }
+  function scopeSuffix(){
+    if (!exportScope) return '';
+    return '-' + exportScope.replace(/\s+/g, '_');
+  }
+  function downloadTxtFile(){
+    var text = $('exportText').value;
+    var d = new Date().toLocaleDateString('fa-IR').replace(/\//g, '-');
+    downloadBlob(new Blob([text], { type: 'text/plain;charset=utf-8' }),
+                 'گزارش-روزانه-' + d + scopeSuffix() + '.txt');
+    toast('فایل متنی دانلود شد');
+  }
+
+  /* ============================================================
+     آماده‌سازی تصویر و PDF
+     ============================================================ */
+  function waitForLibs(cb){
+    if (window.html2canvas && window.jspdf) return cb();
+    var tries = 0;
+    var iv = setInterval(function(){
+      tries++;
+      if ((window.html2canvas && window.jspdf) || tries > 40){ clearInterval(iv); cb(); }
+    }, 100);
+  }
+
+  function capturePreviewCanvas(){
+    return new Promise(function(resolve, reject){
+      var node = $('reportPreview');
+      if (!window.html2canvas) { reject(new Error('html2canvas')); return; }
+      var wasHidden = node.offsetParent === null;
+      var tmpHolder = null;
+      if (wasHidden){
+        tmpHolder = document.createElement('div');
+        tmpHolder.style.cssText =
+          'position:fixed;top:0;left:0;width:820px;background:#fff;' +
+          'z-index:-1;opacity:0;pointer-events:none;overflow:visible;';
+        var clone = node.cloneNode(true);
+        tmpHolder.appendChild(clone);
+        document.body.appendChild(tmpHolder);
+        node = clone;
+      }
+      var scale = Math.min(3, Math.max(2, window.devicePixelRatio || 2));
+      html2canvas(node, {
+        backgroundColor:'#ffffff', scale:scale, useCORS:true,
+        allowTaint:false, logging:false,
+        scrollX:0, scrollY:0,
+        windowWidth:node.scrollWidth, windowHeight:node.scrollHeight,
+        width:node.offsetWidth || 800, height:node.offsetHeight || 1000
+      }).then(function(canvas){
+        if (tmpHolder) tmpHolder.remove();
+        resolve(canvas);
+      }).catch(function(err){
+        if (tmpHolder) tmpHolder.remove();
+        reject(err);
+      });
+    });
+  }
+
+  function prepareImage(){
+    return new Promise(function(resolve, reject){
+      waitForLibs(function(){
+        var rp = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+        rp.then(function(){ return capturePreviewCanvas(); })
+          .then(function(canvas){
+            var d = new Date().toLocaleDateString('fa-IR').replace(/\//g, '-');
+            canvas.toBlob(function(blob){
+              resolve({ kind:'image', blob:blob, canvas:canvas,
+                        filename:'گزارش-روزانه-' + d + scopeSuffix() + '.png' });
+            }, 'image/png');
+          })
+          .catch(reject);
+      });
+    });
+  }
+  function preparePdf(){
+    return new Promise(function(resolve, reject){
+      waitForLibs(function(){
+        var rp = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+        rp.then(function(){ return capturePreviewCanvas(); })
+          .then(function(canvas){
+            var jsPDF = window.jspdf && window.jspdf.jsPDF;
+            if (!jsPDF){ reject(new Error('jsPDF')); return; }
+            var imgData = canvas.toDataURL('image/jpeg', 0.95);
+            var imgW = canvas.width, imgH = canvas.height;
+            var pdf = new jsPDF({ orientation:'p', unit:'mm', format:'a4' });
+            var pageW = pdf.internal.pageSize.getWidth();
+            var pageH = pdf.internal.pageSize.getHeight();
+            var marginX = 10, marginY = 10;
+            var availW = pageW - marginX*2;
+            var availH = pageH - marginY*2;
+            var ratio = imgH / imgW;
+            var drawW = availW, drawH = drawW * ratio;
+            if (drawH > availH){
+              drawH = availH; drawW = drawH / ratio;
+            }
+            var ox = marginX + (availW - drawW)/2;
+            pdf.addImage(imgData,'JPEG',ox,marginY,drawW,drawH,undefined,'FAST');
+            var blob = pdf.output('blob');
+            var d = new Date().toLocaleDateString('fa-IR').replace(/\//g, '-');
+            resolve({ kind:'pdf', blob:blob, canvas:null,
+                      filename:'گزارش-روزانه-' + d + scopeSuffix() + '.pdf' });
+          })
+          .catch(reject);
+      });
+    });
+  }
+
+  /* ============================================================
+     مودال action
+     ============================================================ */
+  var actionModal = $('actionModal');
+  var actionTitle = $('actionTitle');
+  var actionSub   = $('actionSub');
+
+  function openActionModal(kind){
+    var labels = {
+      text: { t:'دریافت یا ارسال فایل متنی', s:'فایل متنی گزارش آماده است.' },
+      image: { t:'دریافت یا ارسال تصویر', s:'تصویر گزارش آماده است.' },
+      pdf: { t:'دریافت یا ارسال PDF', s:'فایل PDF گزارش آماده است.' }
+    };
+    var l = labels[kind] || labels.text;
+    actionTitle.textContent = l.t;
+    actionSub.textContent = l.s;
+    pendingShare.kind = kind;
+    actionModal.hidden = false;
+    document.body.classList.add('no-scroll');
+    requestAnimationFrame(function(){ actionModal.classList.add('show'); });
+  }
+  function closeActionModal(){
+    actionModal.classList.remove('show');
+    if (messengerModal.hidden) document.body.classList.remove('no-scroll');
+    setTimeout(function(){ if (!actionModal.classList.contains('show')) actionModal.hidden = true; }, 200);
+  }
+  function askAction(kind){ openActionModal(kind); }
+
+  var messengerModal = $('messengerModal');
+  function openMessengerModal(){
+    messengerModal.hidden = false;
+    document.body.classList.add('no-scroll');
+    requestAnimationFrame(function(){ messengerModal.classList.add('show'); });
+  }
+  function closeMessengerModal(){
+    messengerModal.classList.remove('show');
+    document.body.classList.remove('no-scroll');
+    setTimeout(function(){ if (!messengerModal.classList.contains('show')) messengerModal.hidden = true; }, 200);
+  }
+
+  function executeDownload(){
+    var kind = pendingShare.kind;
+    if (kind === 'text'){ downloadTxtFile(); closeActionModal(); return; }
+    if (kind === 'image'){
+      toast('در حال آماده‌سازی…');
+      prepareImage().then(function(p){
+        downloadBlob(p.blob, p.filename);
+        toast('تصویر دانلود شد');
+        closeActionModal();
+      }).catch(function(){ toast('خطا در تولید تصویر'); });
+      return;
+    }
+    if (kind === 'pdf'){
+      toast('در حال آماده‌سازی…');
+      preparePdf().then(function(p){
+        downloadBlob(p.blob, p.filename);
+        toast('PDF دانلود شد');
+        closeActionModal();
+      }).catch(function(){ toast('خطا در تولید PDF'); });
+      return;
+    }
+  }
+
+  function executeShare(){
+    var kind = pendingShare.kind;
+    if (kind === 'text'){
+      pendingShare.text = $('exportText').value;
+      openMessengerModal();
+      return;
+    }
+    var prep = (kind === 'image') ? prepareImage() : preparePdf();
+    toast('در حال آماده‌سازی…');
+    prep.then(function(p){
+      pendingShare.blob = p.blob;
+      pendingShare.canvas = p.canvas;
+      pendingShare.text = '';
+      pendingShare.filename = p.filename;
+      openMessengerModal();
+    }).catch(function(){ toast('خطا در آماده‌سازی'); });
+  }
+
+  var APP_SCHEMES = {
+    telegram: { app:'tg://', web:'https://t.me/', name:'تلگرام' },
+    eitaa:    { app:'eitaa://', web:'https://eitaa.com/', name:'ایتا' },
+    bale:     { app:'bale://', web:'https://web.bale.ai/', name:'بله' },
+    soroush:  { app:'soroush://', web:'https://sapp.ir/', name:'سروش' },
+    whatsapp: { app:'whatsapp://send', web:'https://web.whatsapp.com/', name:'واتساپ' },
+    pinterest:{ app:'pinterest://', web:'https://www.pinterest.com/', name:'پینترست' }
+  };
+
+  function buildShareData(){
+    var kind = pendingShare.kind;
+    if (kind === 'text'){
+      return { text: pendingShare.text || $('exportText').value, title:'گزارش روزانه' };
+    }
+    if (pendingShare.blob){
+      var mime = (kind === 'pdf') ? 'application/pdf' : 'image/png';
+      var file = new File([pendingShare.blob], pendingShare.filename || 'report', { type:mime });
+      return { files:[file], text:'گزارش کارها', title:'گزارش روزانه' };
+    }
+    return { text:'', title:'گزارش روزانه' };
+  }
+
+  function shareToApp(app){
+    var info = APP_SCHEMES[app] || APP_SCHEMES.telegram;
+    if (navigator.share){
+      var shareData = buildShareData();
+      if (shareData.files && navigator.canShare && navigator.canShare({ files: shareData.files })){
+        navigator.share(shareData)
+          .then(function(){ toast('در ' + info.name + ' ارسال کنید'); closeMessengerModal(); closeActionModal(); })
+          .catch(function(err){
+            if (err && err.name === 'AbortError') return;
+            fallbackManual(app);
+          });
+        return;
+      }
+      if (!shareData.files && shareData.text){
+        navigator.share({ text: shareData.text, title:'گزارش روزانه' })
+          .then(function(){ toast('در ' + info.name + ' ارسال کنید'); closeMessengerModal(); closeActionModal(); })
+          .catch(function(err){
+            if (err && err.name === 'AbortError') return;
+            fallbackManual(app);
+          });
+        return;
+      }
+    }
+    fallbackManual(app);
+  }
+
+  function fallbackManual(app){
+    var info = APP_SCHEMES[app] || APP_SCHEMES.telegram;
+    var kind = pendingShare.kind;
+    if (kind === 'text'){
+      copyText(pendingShare.text || $('exportText').value).then(function(){
+        toast('متن کپی شد — در ' + info.name + ' پیست کنید');
+        openApp(app, info);
+      });
+      return;
+    }
+    if (pendingShare.blob){
+      downloadBlob(pendingShare.blob, pendingShare.filename);
+      toast('فایل دانلود شد — در ' + info.name + ' ارسال کنید');
+    }
+    openApp(app, info);
+  }
+
+  function openApp(app, info){
+    var start = Date.now();
+    try {
+      var iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = info.app;
+      document.body.appendChild(iframe);
+      setTimeout(function(){ if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 1500);
+    } catch(e){}
+    setTimeout(function(){
+      if (Date.now() - start < 1500 && !document.hidden){
+        try { window.open(info.web, '_blank', 'noopener'); }
+        catch(e){ window.location.href = info.web; }
+      }
+    }, 1100);
+    closeMessengerModal(); closeActionModal();
+  }
+
+  /* ============================================================
+     مودال confirm
+     ============================================================ */
+  var confirmModal = $('confirmModal');
+  var confirmYes = $('confirmYes');
+  var confirmNo  = $('confirmNo');
+  var confirmCb  = null;
+  function openConfirm(title, sub, cb){
+    $('confirmTitle').textContent = title;
+    $('confirmSub').textContent = sub;
+    confirmCb = cb;
+    confirmModal.hidden = false;
+    document.body.classList.add('no-scroll');
+    requestAnimationFrame(function(){ confirmModal.classList.add('show'); });
+  }
+  function closeConfirm(){
+    confirmModal.classList.remove('show');
+    document.body.classList.remove('no-scroll');
+    setTimeout(function(){ if (!confirmModal.classList.contains('show')) confirmModal.hidden = true; }, 200);
+    confirmCb = null;
+  }
+
+  /* ============================================================
+     مودال نوع سفارشی
+     ============================================================ */
+  var customTypeModal = $('customTypeModal');
+  function openCustomTypeModal(){
+    $('newCustomTypeName').value = '';
+    customTypeModal.hidden = false;
+    document.body.classList.add('no-scroll');
+    requestAnimationFrame(function(){
+      customTypeModal.classList.add('show');
+      setTimeout(function(){ try { $('newCustomTypeName').focus(); } catch(e){} }, 200);
+    });
+  }
+  function closeCustomTypeModal(){
+    customTypeModal.classList.remove('show');
+    document.body.classList.remove('no-scroll');
+    setTimeout(function(){ if (!customTypeModal.classList.contains('show')) customTypeModal.hidden = true; }, 200);
+  }
+  function confirmAddCustomType(){
+    var name = ($('newCustomTypeName').value || '').trim();
+    if (!name){ toast('نام را وارد کنید'); return; }
+    if (name.length > 40) name = name.slice(0, 40);
+    if (BASE_TYPES.indexOf(name) !== -1 || name === STATUS_TYPE){ toast('این نام وجود دارد'); return; }
+    if (customTypes.indexOf(name) !== -1){ toast('قبلاً اضافه شده'); return; }
+    customTypes.push(name);
+    currentType = name;
+    persistNow();
+    rebuildAllUIs();
+    renderCustomTypeTiles();
+    markTypeTiles();
+    updateTypeVisibility();
+    formDirty = true;
+    closeCustomTypeModal();
+    toast('نوع «' + name + '» اضافه شد');
+  }
+
+  /* ============================================================
+     مودال فیلد سفارشی
+     ============================================================ */
+  var customFieldModal = $('customFieldModal');
+  var selectedFieldGroup = 'custom';
+
+  function setFieldGroup(group){
+    selectedFieldGroup = group;
+    var items = document.querySelectorAll('#groupPicker .gp-item');
+    for (var i=0; i<items.length; i++){
+      items[i].classList.toggle('active', items[i].getAttribute('data-group') === group);
+    }
+  }
+
+  function openCustomFieldModal(){
+    $('newFieldName').value = '';
+    $('newFieldSticker').value = '';
+    setFieldGroup('custom');
+    customFieldModal.hidden = false;
+    document.body.classList.add('no-scroll');
+    requestAnimationFrame(function(){
+      customFieldModal.classList.add('show');
+      setTimeout(function(){ try { $('newFieldName').focus(); } catch(e){} }, 200);
+    });
+  }
+  function closeCustomFieldModal(){
+    customFieldModal.classList.remove('show');
+    document.body.classList.remove('no-scroll');
+    setTimeout(function(){ if (!customFieldModal.classList.contains('show')) customFieldModal.hidden = true; }, 200);
+  }
+
+  function bindGroupPicker(){
+    var items = document.querySelectorAll('#groupPicker .gp-item');
+    for (var i=0; i<items.length; i++){
+      (function(btn){
+        btn.addEventListener('click', function(){
+          setFieldGroup(btn.getAttribute('data-group') || 'custom');
+        });
+      })(items[i]);
+    }
+  }
+
+  function confirmAddCustomField(){
+    var name = ($('newFieldName').value || '').trim();
+    var sticker = ($('newFieldSticker').value || '').trim();
+    var group = selectedFieldGroup || 'custom';
+
+    if (!name){ toast('نام فیلد را وارد کنید'); return; }
+    if (name.length > 40) name = name.slice(0, 40);
+    if (sticker.length > 4) sticker = sticker.slice(0, 4);
+    if (ALLOWED_GROUPS.indexOf(group) === -1) group = 'custom';
+
+    var all = allFields();
+    for (var i=0; i<all.length; i++){
+      if (all[i].label === name){
+        toast('این نام قبلاً استفاده شده');
+        return;
+      }
+    }
+
+    var newField = {
+      id: uidField(),
+      label: name,
+      sticker: sticker || '✨',
+      group: group,
+      pair: false,
+      isCustom: true
+    };
+    customFields.push(newField);
+    optionalState[newField.id] = true;
+
+    persistNow();
+    renderOptionalTiles();
+    renderDynamicFields();
+    applyOptionalState();
+    closeCustomFieldModal();
+    toast('فیلد «' + name + '» در گروه «' + (GROUP_LABELS[group] || 'سفارشی') + '» اضافه شد');
+  }
+
+  /* ============================================================
+     ریست‌ها — بدون reload و بدون پاک‌کردن کل مرورگر
+     ============================================================ */
+  function clearJobsOnly(){
+    state.jobs = [];
+    persistNow(); lastIdsKey = ''; render();
+    dashCache.lastSignature = '';
+    updateDashboard();
+    toast('لیست کارها پاک شد');
+  }
+
+  function fullReset(){
+    /* پاک‌سازی کلیدهای این اپ */
+    try {
+      localStorage.removeItem(LS_KEY);
+      localStorage.removeItem(LS_OPTS);
+      localStorage.removeItem(LS_TYPES);
+      localStorage.removeItem(LS_FIELDS);
+      localStorage.removeItem(LS_HISTORY);
+    } catch(e){}
+
+    /* ریست state در حافظه */
+    state.reportDate = jalaliToFa(todayJalali());
+    state.carKm = '';
+    state.team = '';
+    state.jobs = [];
+    history = [];
+    currentType = 'FTTH';
+    exportScope = '';
+    customTypes = [];
+    customFields = [];
+    optionalState = {};
+    currentFormTag = 'done';
+    editingId = null;
+    formDirty = false;
+    lastIdsKey = '';
+    dashCache.lastSignature = '';
+
+    ensureOptionalState();
+
+    /* به‌روزرسانی inputها */
+    if ($('reportDate')) $('reportDate').value = state.reportDate;
+    if ($('carKm')) $('carKm').value = '';
+    if ($('team')) $('team').value = '';
+    if ($('search')) $('search').value = '';
+    if ($('filterType')) $('filterType').value = '';
+    if ($('includeMeta')) $('includeMeta').checked = true;
+
+    /* رندر مجدد کل UI */
+    rebuildAllUIs();
+    renderCustomTypeTiles();
+    markTypeTiles();
+    renderOptionalTiles();
+    renderDynamicFields();
+    applyOptionalState();
+    updateTypeVisibility();
+    updateDescVisibility();
+    renderTagFormUI();
+    render();
+    updateDashboard();
+
+    /* بستن مودال‌ها/شیت‌های باز */
+    try {
+      if (overlay && !overlay.hidden) closeForm(true);
+      if (exportOverlay && !exportOverlay.hidden) closeExport();
+    } catch(e){}
+
+    toast('برنامه ریست شد');
+  }
+
+  function hardReset(){
+    /* پاک‌سازی کلیدهای fiber* */
+    try {
+      var keys = [];
+      for (var i=0; i<localStorage.length; i++){
+        var k = localStorage.key(i);
+        if (!k) continue;
+        if (k.indexOf('fiber') === 0) keys.push(k);
+      }
+      for (var j=0; j<keys.length; j++) localStorage.removeItem(keys[j]);
+    } catch(e){}
+
+    /* ریست state در حافظه (بدون reload) */
+    state.reportDate = jalaliToFa(todayJalali());
+    state.carKm = '';
+    state.team = '';
+    state.jobs = [];
+    history = [];
+    currentType = 'FTTH';
+    exportScope = '';
+    customTypes = [];
+    customFields = [];
+    optionalState = {};
+    currentFormTag = 'done';
+    editingId = null;
+    formDirty = false;
+    lastIdsKey = '';
+    dashCache.lastSignature = '';
+
+    /* بازگشت به تم سیستم */
+    var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(systemDark ? 'dark' : 'light');
+
+    ensureOptionalState();
+
+    if ($('reportDate')) $('reportDate').value = state.reportDate;
+    if ($('carKm')) $('carKm').value = '';
+    if ($('team')) $('team').value = '';
+    if ($('search')) $('search').value = '';
+    if ($('filterType')) $('filterType').value = '';
+    if ($('includeMeta')) $('includeMeta').checked = true;
+
+    rebuildAllUIs();
+    renderCustomTypeTiles();
+    markTypeTiles();
+    renderOptionalTiles();
+    renderDynamicFields();
+    applyOptionalState();
+    updateTypeVisibility();
+    updateDescVisibility();
+    renderTagFormUI();
+    render();
+    updateDashboard();
+
+    try {
+      if (overlay && !overlay.hidden) closeForm(true);
+      if (exportOverlay && !exportOverlay.hidden) closeExport();
+    } catch(e){}
+
+    /* بازگشت به صفحه‌ی اصلی */
+    showScreen('landing', true);
+
+    toast('حافظه پاک شد');
+  }
+
+  /* ============================================================
+     صفحه تاریخچه
+     ============================================================ */
+  var calState = { jy: 0, jm: 0, selectedKey: '' };
+
+  function initCalState(){
+    var t = parseJalali(state.reportDate) || todayJalali();
+    calState.jy = t.jy;
+    calState.jm = t.jm;
+    calState.selectedKey = jalaliToKey(t);
+  }
+
+  function renderCalendar(){
+    var grid = $('calGrid');
+    if (!grid) return;
+
+    if (!calState.jy) initCalState();
+
+    var jy = calState.jy, jm = calState.jm;
+    $('calTitle').innerHTML = JALALI_MONTHS[jm - 1] + ' ' + toFa(jy) +
+      '<span>' + toFa(jMonthDays(jy, jm)) + ' روز</span>';
+
+    var firstDow = jWeekday(jy, jm, 1);
+    var daysInMonth = jMonthDays(jy, jm);
+    var today = todayJalali();
+    var isCurrentMonth = (today.jy === jy && today.jm === jm);
+    var jobsMap = daysWithJobsInMonth(jy, jm);
+
+    var html = '';
+    for (var d=0; d<7; d++){
+      html += '<div class="cal-dow">' + JALALI_DOW[d] + '</div>';
+    }
+    for (var e=0; e<firstDow; e++){
+      html += '<div class="cal-day empty"></div>';
+    }
+    for (var day=1; day<=daysInMonth; day++){
+      var key = jy + '/' + pad2(jm) + '/' + pad2(day);
+      var hasJobs = !!jobsMap[day];
+      var isToday = isCurrentMonth && today.jd === day;
+      var isSelected = calState.selectedKey === key;
+      var cls = 'cal-day';
+      if (isToday) cls += ' today';
+      if (hasJobs) cls += ' has-jobs';
+      if (isSelected) cls += ' selected';
+      html += '<button class="' + cls + '" data-day="' + day + '" data-key="' + key + '" type="button">' +
+                (hasJobs ? '<span class="cal-count">' + toFa(jobsMap[day]) + '</span>' : '') +
+                toFa(day) +
+                (hasJobs ? '<span class="cal-dot"></span>' : '') +
+              '</button>';
+    }
+
+    grid.innerHTML = html;
+
+    var btns = grid.querySelectorAll('.cal-day[data-key]');
+    for (var i=0; i<btns.length; i++){
+      (function(b){
+        b.addEventListener('click', function(){
+          selectCalDay(b.getAttribute('data-key'));
+        });
+      })(btns[i]);
+    }
+
+    if (calState.selectedKey) renderHistList(calState.selectedKey);
+    else selectCalDay(jalaliToKey(today));
+  }
+
+  function selectCalDay(key){
+    calState.selectedKey = key;
+    var btns = document.querySelectorAll('#calGrid .cal-day[data-key]');
+    for (var i=0; i<btns.length; i++){
+      btns[i].classList.toggle('selected', btns[i].getAttribute('data-key') === key);
+    }
+    renderHistList(key);
+  }
+
+  function renderHistList(key){
+    var listBox = $('histJobList');
+    var emptyBox = $('histEmpty');
+    var map = groupJobsByDate();
+    var list = map[key] || [];
+
+    var p = key.split('/');
+    var jy = +p[0], jm = +p[1], jd = +p[2];
+    $('histDateLabel').textContent = toFa(jd) + ' ' + JALALI_MONTHS[jm - 1] + ' ' + toFa(jy);
+    $('histCountLabel').textContent = toFa(list.length) + ' مورد';
+
+    if (!list.length){
+      listBox.innerHTML = '';
+      emptyBox.hidden = false;
+      return;
+    }
+    emptyBox.hidden = true;
+
+    list.sort(function(a, b){ return (a.createdAt || 0) - (b.createdAt || 0); });
+    var html = '';
+    for (var i=0; i<list.length; i++){
+      var j = list[i];
+      var title = j.address || j.name || 'بدون عنوان';
+      var sub = [];
+      if (j.pelak) sub.push('پلاک ' + j.pelak);
+      if (j.unit) sub.push('واحد ' + j.unit);
+      if (j.mobile) sub.push(j.mobile);
+      var tm = tagMeta(j.tag || 'none');
+      var tagHTML = (j.tag && j.tag !== 'none')
+        ? '<span class="hj-badge" style="background:' + tm.color + '1a;color:' + tm.color + ';">' + tm.emoji + ' ' + esc(tm.label) + '</span>'
+        : '';
+      html +=
+        '<div class="hist-job">' +
+          '<div class="hj-main">' +
+            '<div class="hj-title">' + typeSticker(j.type) + ' ' + esc(title) + '</div>' +
+            '<div class="hj-sub">' + esc(j.type || '—') + (sub.length ? ' • ' + esc(sub.join(' • ')) : '') + '</div>' +
+          '</div>' +
+          tagHTML +
+        '</div>';
+    }
+    listBox.innerHTML = html;
+  }
+
+  function calPrevMonth(){
+    calState.jm--;
+    if (calState.jm < 1){ calState.jm = 12; calState.jy--; }
+    calState.selectedKey = '';
+    renderCalendar();
+  }
+  function calNextMonth(){
+    calState.jm++;
+    if (calState.jm > 12){ calState.jm = 1; calState.jy++; }
+    calState.selectedKey = '';
+    renderCalendar();
+  }
+  function calToday(){
+    var t = todayJalali();
+    calState.jy = t.jy; calState.jm = t.jm;
+    calState.selectedKey = jalaliToKey(t);
+    renderCalendar();
+  }
+
+  /* ============================================================
+     صفحه نمودار — داینامیک (همه‌ی انواع)
+     ============================================================ */
+  var anState = { jy: 0, jm: 0, chartData: null };
+
+  function initAnState(){
+    var t = todayJalali();
+    anState.jy = t.jy;
+    anState.jm = t.jm;
+  }
+
+  function collectMonthData(jy, jm){
+    var map = groupJobsByDate();
+    var prefix = jy + '/' + pad2(jm) + '/';
+    var jobs = [];
+    for (var k in map){
+      if (!map.hasOwnProperty(k)) continue;
+      if (k.indexOf(prefix) !== 0) continue;
+      var arr = map[k];
+      for (var i=0; i<arr.length; i++) jobs.push(arr[i]);
+    }
+
+    var byType = {};
+    for (var j=0; j<jobs.length; j++){
+      var t = jobs[j].type || '—';
+      byType[t] = (byType[t] || 0) + 1;
+    }
+
+    var daySet = {};
+    for (var jj=0; jj<jobs.length; jj++){
+      var dk = dayKeyOfJob(jobs[jj]);
+      if (dk) daySet[dk] = true;
+    }
+
+    /* جزئیات کابل بسترسازی */
+    var bstr = [];
+    for (var b=0; b<jobs.length; b++){
+      if (jobs[b].type === 'بسترسازی'){
+        var jb = jobs[b];
+        bstr.push({
+          k8s: jb.k8s || '', k8e: jb.k8e || '',
+          k2s: jb.k2s || '', k2e: jb.k2e || '',
+          date: jb.date || ''
+        });
+      }
+    }
+
+    return {
+      total: jobs.length,
+      activeDays: Object.keys(daySet).length,
+      byType: byType,
+      bstrDetails: bstr
+    };
+  }
+
+  /* رنگ هر نوع — پایه‌ها ثابت، سفارشی‌ها چرخه‌ای */
+  var CUSTOM_COLORS = ['#7e22ce','#0e7490','#a16207','#be123c','#4338ca','#047857','#9333ea','#b45309'];
+  function chartColorFor(type){
+    if (type === 'FTTH') return '#0369a1';
+    if (type === 'Swap') return '#6d28d9';
+    if (type === 'بسترسازی') return '#15803d';
+    if (type === 'خرابی') return '#b91c1c';
+    if (type === 'تعیین وضعیت') return '#b45309';
+    var ci = customTypes.indexOf(type);
+    if (ci !== -1) return CUSTOM_COLORS[ci % CUSTOM_COLORS.length];
+    return '#64748b';
+  }
+
+  function drawChart(){
+    var canvas = $('anChartCanvas');
+    if (!canvas) return;
+    var data = anState.chartData;
+    if (!data) return;
+
+    var ctx = canvas.getContext('2d');
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    var cssW = canvas.clientWidth || 320;
+    /* ارتفاع پویا بر اساس تعداد انواع */
+    var typesList = [];
+    for (var t in data.byType){
+      if (data.byType.hasOwnProperty(t)) typesList.push(t);
+    }
+    /* ترتیب: پایه‌ها + سفارشی‌ها + تعیین وضعیت */
+    var orderedForChart = [];
+    for (var bo=0; bo<BASE_TYPES.length; bo++){
+      if (data.byType[BASE_TYPES[bo]]) orderedForChart.push(BASE_TYPES[bo]);
+    }
+    for (var cc=0; cc<customTypes.length; cc++){
+      if (data.byType[customTypes[cc]]) orderedForChart.push(customTypes[cc]);
+    }
+    if (data.byType[STATUS_TYPE]) orderedForChart.push(STATUS_TYPE);
+    /* هر نوعی که در byType هست ولی در orderedForChart نیست */
+    for (var tt in data.byType){
+      if (data.byType.hasOwnProperty(tt) && orderedForChart.indexOf(tt) === -1) orderedForChart.push(tt);
+    }
+    if (!orderedForChart.length) orderedForChart = ['—'];
+
+    var rowH = 40;
+    var padT = 14, padB = 14;
+    var cssH = Math.max(180, padT + padB + orderedForChart.length * rowH);
+
+    canvas.width = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssH * dpr);
+    canvas.style.height = cssH + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var textColor = isDark ? '#e2e8f0' : '#0f172a';
+    var mutedColor = isDark ? '#64748b' : '#94a3b8';
+    var trackColor = isDark ? '#18222f' : '#f1f5f9';
+
+    var maxCount = 0;
+    for (var m=0; m<orderedForChart.length; m++){
+      var c = data.byType[orderedForChart[m]] || 0;
+      if (c > maxCount) maxCount = c;
+    }
+    if (maxCount === 0) maxCount = 1;
+
+    var padL = Math.min(110, Math.max(70, cssW * 0.22));
+    var padR = 44;
+    var barH = Math.min(20, rowH * 0.55);
+    var trackX = padL;
+    var trackW = cssW - padL - padR;
+
+    ctx.textBaseline = 'middle';
+
+    for (var k=0; k<orderedForChart.length; k++){
+      var it = orderedForChart[k];
+      var count = data.byType[it] || 0;
+      var cy = padT + rowH * k + rowH / 2;
+
+      /* لیبل نوع */
+      ctx.fillStyle = textColor;
+      ctx.textAlign = 'right';
+      ctx.font = '11px Vazirmatn, system-ui, Tahoma, sans-serif';
+      var labelTxt = typeSticker(it) + ' ' + it;
+      if (labelTxt.length > 18) labelTxt = labelTxt.slice(0, 17) + '…';
+      ctx.fillText(labelTxt, padL - 8, cy);
+
+      /* پس‌زمینه‌ی میله */
+      ctx.fillStyle = trackColor;
+      roundRect(ctx, trackX, cy - barH / 2, trackW, barH, barH / 2);
+      ctx.fill();
+
+      /* میله‌ی مقدار */
+      var pct = count / maxCount;
+      var w = Math.max(count > 0 ? 6 : 0, trackW * pct);
+      if (w > 0){
+        ctx.fillStyle = chartColorFor(it);
+        roundRect(ctx, trackX, cy - barH / 2, w, barH, barH / 2);
+        ctx.fill();
+      }
+
+      /* عدد انتهایی */
+      ctx.fillStyle = textColor;
+      ctx.textAlign = 'left';
+      ctx.font = 'bold 11px Vazirmatn, system-ui, Tahoma, sans-serif';
+      ctx.fillText(toFa(count), cssW - padR + 6, cy);
+
+      /* جزئیات کابل برای بسترسازی */
+      if (it === 'بسترسازی' && data.bstrDetails && data.bstrDetails.length){
+        ctx.fillStyle = mutedColor;
+        ctx.textAlign = 'left';
+        ctx.font = '9px Vazirmatn, system-ui, Tahoma, sans-serif';
+        var detailY = cy + barH / 2 + 7;
+        if (detailY < cssH - 4){
+          var tot8 = 0, tot2 = 0, has8 = false, has2 = false;
+          for (var d=0; d<data.bstrDetails.length; d++){
+            var dd = data.bstrDetails[d];
+            if (dd.k8s || dd.k8e){
+              var s8 = parseFloat(toEn(dd.k8s || '0')) || 0;
+              var e8 = parseFloat(toEn(dd.k8e || '0')) || 0;
+              if (dd.k8s || dd.k8e){ tot8 += Math.max(0, e8 - s8); has8 = true; }
+            }
+            if (dd.k2s || dd.k2e){
+              var s2 = parseFloat(toEn(dd.k2s || '0')) || 0;
+              var e2 = parseFloat(toEn(dd.k2e || '0')) || 0;
+              if (dd.k2s || dd.k2e){ tot2 += Math.max(0, e2 - s2); has2 = true; }
+            }
+          }
+          var txt = '';
+          if (has8) txt += '۸کر: ' + toFa(Math.round(tot8)) + 'm';
+          if (has2) txt += (txt ? '  |  ' : '') + '۲کر: ' + toFa(Math.round(tot2)) + 'm';
+          if (txt) ctx.fillText(txt, trackX + 4, detailY);
+        }
+      }
+    }
+  }
+
+  function roundRect(ctx, x, y, w, h, r){
+    if (w < r * 2) r = w / 2;
+    if (h < r * 2) r = h / 2;
+    if (r < 0) r = 0;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function renderAnalytics(){
+    if (!anState.jy) initAnState();
+    var jy = anState.jy, jm = anState.jm;
+
+    $('anPeriodLabel').textContent = JALALI_MONTHS[jm - 1] + ' ' + toFa(jy);
+
+    var data = collectMonthData(jy, jm);
+    anState.chartData = data;
+
+    $('anTotal').textContent = toFa(data.total);
+    $('anDays').textContent = toFa(data.activeDays);
+    var avg = data.activeDays ? Math.round(data.total / data.activeDays) : 0;
+    $('anAvg').textContent = toFa(avg);
+
+    $('anChartMeta').textContent = data.total
+      ? toFa(data.total) + ' کار در ' + toFa(data.activeDays) + ' روز'
+      : 'بدون داده';
+
+    drawChart();
+
+    /* لجند — داینامیک */
+    var legendBox = $('anLegend');
+    var ordered = allOrderedTypes();
+    var lhtml = '';
+    for (var i=0; i<ordered.length; i++){
+      var t = ordered[i];
+      var c = data.byType[t] || 0;
+      if (!c) continue;
+      lhtml += '<span class="al-item"><span class="al-sw" style="background:' + chartColorFor(t) + ';"></span>' + esc(t) + ' (' + toFa(c) + ')</span>';
+    }
+    legendBox.innerHTML = lhtml;
+
+    /* جزئیات — داینامیک */
+    var detBox = $('anDetailList');
+    var detEmpty = $('anDetailEmpty');
+    var detMeta = $('anDetailMeta');
+
+    if (!data.total){
+      detBox.innerHTML = '';
+      detEmpty.hidden = false;
+      detMeta.textContent = '—';
+    } else {
+      detEmpty.hidden = true;
+      detMeta.textContent = toFa(data.total) + ' کار';
+      var dhtml = '';
+      for (var b=0; b<ordered.length; b++){
+        var tt = ordered[b];
+        var cc = data.byType[tt] || 0;
+        if (!cc) continue;
+        var isMini = (BASE_TYPES.indexOf(tt) === -1);
+        dhtml +=
+          '<div class="an-detail-item' + (isMini ? ' is-mini' : '') + '">' +
+            '<div class="adi-main">' +
+              '<div class="adi-title"><span class="adi-sw" style="background:' + chartColorFor(tt) + ';"></span>' + typeSticker(tt) + ' ' + esc(tt) + '</div>' +
+              '<div class="adi-sub">' + toFa(cc) + ' مورد در این ماه</div>' +
+            '</div>' +
+            '<div class="adi-num">' + toFa(cc) + '</div>' +
+          '</div>';
+      }
+      detBox.innerHTML = dhtml;
+    }
+  }
+
+  function anPrevMonth(){
+    anState.jm--;
+    if (anState.jm < 1){ anState.jm = 12; anState.jy--; }
+    renderAnalytics();
+  }
+  function anNextMonth(){
+    anState.jm++;
+    if (anState.jm > 12){ anState.jm = 1; anState.jy++; }
+    renderAnalytics();
+  }
+
+  /* ============================================================
+     رویدادها
+     ============================================================ */
+  function bindEvents(){
+    /* تم */
+    $('themeBtnLanding').addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      applyTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+    $('themeBtn').addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      applyTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+    $('themeBtnHistory').addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      applyTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+    $('themeBtnAnalytics').addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      applyTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+
+    /* ناوبری */
+    $('openReportBtn').addEventListener('click', function(){ navigateTo('reportApp'); });
+    $('homeBtn').addEventListener('click', function(){ navigateTo('landing'); });
+    $('dashOpenReport').addEventListener('click', function(){ navigateTo('reportApp'); });
+    $('dashOpenHistory').addEventListener('click', function(){ navigateTo('historyScreen'); });
+    $('dashOpenAnalytics').addEventListener('click', function(){ navigateTo('analyticsScreen'); });
+    $('landingHistoryBtn').addEventListener('click', function(){ navigateTo('historyScreen'); });
+    $('landingAnalyticsBtn').addEventListener('click', function(){ navigateTo('analyticsScreen'); });
+    $('historyBtn').addEventListener('click', function(){ navigateTo('historyScreen'); });
+    $('analyticsBtn').addEventListener('click', function(){ navigateTo('analyticsScreen'); });
+    $('historyBackBtn').addEventListener('click', function(){ navigateTo('reportApp'); });
+    $('analyticsBackBtn').addEventListener('click', function(){ navigateTo('reportApp'); });
+    $('historyHomeBtn').addEventListener('click', function(){ navigateTo('landing'); });
+    $('analyticsHomeBtn').addEventListener('click', function(){ navigateTo('landing'); });
+
+    /* تقویم */
+    $('calPrev').addEventListener('click', calPrevMonth);
+    $('calNext').addEventListener('click', calNextMonth);
+    $('calToday').addEventListener('click', calToday);
+
+    /* نمودار */
+    $('anPrev').addEventListener('click', anPrevMonth);
+    $('anNext').addEventListener('click', anNextMonth);
+
+    /* تنظیمات گزارش */
+    $('reportDate').addEventListener('input', function(){
+      state.reportDate = this.value; persist(); lastIdsKey = ''; render();
+      if (!exportOverlay.hidden){ $('exportText').value = buildExport(); refreshPreview(); }
+    });
+    $('todayBtn').addEventListener('click', function(){
+      var t = jalaliToFa(todayJalali());
+      $('reportDate').value = t;
+      state.reportDate = t;
+      persist(); lastIdsKey = ''; render();
+      if (!exportOverlay.hidden){ $('exportText').value = buildExport(); refreshPreview(); }
+    });
+    $('carKm').addEventListener('input', function(){
+      state.carKm = this.value; persist();
+      if (!exportOverlay.hidden){ $('exportText').value = buildExport(); refreshPreview(); }
+    });
+    $('team').addEventListener('input', function(){
+      state.team = this.value; persist();
+      if (!exportOverlay.hidden){ $('exportText').value = buildExport(); refreshPreview(); }
+    });
+
+    /* تگ در فرم */
+    var tagBtns = document.querySelectorAll('#tagFormGrid .tag-form-choice');
+    for (var t=0; t<tagBtns.length; t++){
+      (function(b){
+        b.addEventListener('click', function(){
+          setFormTag(b.getAttribute('data-tag'));
+        });
+      })(tagBtns[t]);
+    }
+
+    /* افزودن کار */
+    $('addBtn').addEventListener('click', function(){ openForm(null); });
+    $('exportBtn').addEventListener('click', function(){ exportScope = ''; openExport(''); });
+    $('includeMeta').addEventListener('change', function(){
+      $('exportText').value = buildExport();
+      refreshPreview();
+    });
+
+    /* جستجو و فیلتر */
+    var searchTimer = null;
+    $('search').addEventListener('input', function(){
+      if (searchTimer) clearTimeout(searchTimer);
+      searchTimer = setTimeout(function(){ searchTimer = null; render(); }, 140);
+    });
+    $('filterType').addEventListener('change', function(){ render(); });
+
+    /* نوع تحویلی */
+    var typeTiles = document.querySelectorAll('#typeGrid .type-item:not(.custom-type)');
+    for (var i=0; i<typeTiles.length; i++){
+      (function(tile){
+        tile.addEventListener('click', function(){
+          selectType(tile.getAttribute('data-type'));
+        });
+        tile.addEventListener('keydown', function(e){
+          if (e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            selectType(tile.getAttribute('data-type'));
+          }
+        });
+      })(typeTiles[i]);
+    }
+
+    /* مودال نوع سفارشی */
+    $('addCustomTypeBtn').addEventListener('click', openCustomTypeModal);
+    $('customTypeAdd').addEventListener('click', confirmAddCustomType);
+    $('customTypeCancel').addEventListener('click', closeCustomTypeModal);
+    $('newCustomTypeName').addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){ e.preventDefault(); confirmAddCustomType(); }
+    });
+    customTypeModal.addEventListener('click', function(e){
+      if (e.target === customTypeModal) closeCustomTypeModal();
+    });
+
+    /* مودال فیلد سفارشی */
+    $('customFieldAdd').addEventListener('click', confirmAddCustomField);
+    $('customFieldCancel').addEventListener('click', closeCustomFieldModal);
+    $('newFieldName').addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){ e.preventDefault(); confirmAddCustomField(); }
+    });
+    customFieldModal.addEventListener('click', function(e){
+      if (e.target === customFieldModal) closeCustomFieldModal();
+    });
+    bindGroupPicker();
+
+    /* توضیحات */
+    $('hasDesc').addEventListener('change', function(){
+      updateDescVisibility();
+      if (!this.checked){ var d = formEl.elements['desc']; if (d) d.value = ''; }
+      else { setTimeout(function(){ var d = formEl.elements['desc']; if (d) d.focus(); }, 260); }
+      formDirty = true;
+    });
+
+    /* ذخیره فرم */
+    $('saveBtn').addEventListener('click', function(){ saveJob(false); });
+    $('saveNextBtn').addEventListener('click', function(){ saveJob(true); });
+    $('closeFormBtn').addEventListener('click', function(){ closeForm(false); });
+    overlay.addEventListener('click', function(e){ if (e.target === overlay) closeForm(false); });
+
+    /* خروجی */
+    $('closeExportBtn').addEventListener('click', closeExport);
+    exportOverlay.addEventListener('click', function(e){ if (e.target === exportOverlay) closeExport(); });
+    var tabs = document.querySelectorAll('.tab-btn');
+    for (var tb=0; tb<tabs.length; tb++){
+      tabs[tb].addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); });
+    }
+    document.addEventListener('click', function(e){
+      if (e.target && e.target.id === 'pdfDownloadInline'){ askAction('pdf'); }
+    });
+
+    /* action / messenger */
+    $('actDownload').addEventListener('click', executeDownload);
+    $('actShare').addEventListener('click', executeShare);
+    $('actCancel').addEventListener('click', function(){
+      closeActionModal();
+      pendingShare = { kind:null, text:'', canvas:null, blob:null, filename:'' };
+    });
+    $('messengerCancel').addEventListener('click', function(){ closeMessengerModal(); });
+    var msgs = document.querySelectorAll('#messengerModal button[data-app]');
+    for (var m=0; m<msgs.length; m++){
+      (function(btn){
+        btn.addEventListener('click', function(){ shareToApp(btn.getAttribute('data-app')); });
+      })(msgs[m]);
+    }
+    actionModal.addEventListener('click', function(e){
+      if (e.target === actionModal){
+        closeActionModal();
+        pendingShare = { kind:null, text:'', canvas:null, blob:null, filename:'' };
+      }
+    });
+    messengerModal.addEventListener('click', function(e){
+      if (e.target === messengerModal) closeMessengerModal();
+    });
+
+    /* ریست */
+    $('clearJobsBtn').addEventListener('click', function(){
+      if (!state.jobs.length){ toast('لیست خالی است'); return; }
+      openConfirm('حذف لیست کارها',
+        'همه‌ی کارها حذف می‌شوند اما تنظیمات پایه حفظ می‌ماند. ادامه می‌دهید؟',
+        function(){ clearJobsOnly(); closeConfirm(); });
+    });
+    $('fullResetBtn').addEventListener('click', function(){
+      openConfirm('ریست کامل برنامه',
+        'تمام داده‌ها حذف می‌شوند اما برنامه بدون بارگذاری مجدد ریست می‌شود. ادامه می‌دهید؟',
+        function(){ fullReset(); closeConfirm(); });
+    });
+    $('hardResetBtn').addEventListener('click', function(){
+      openConfirm('حذف کامل حافظه',
+        'کلیدهای مرتبط با این اپ پاک و برنامه بدون reload ریست می‌شود. ادامه می‌دهید؟',
+        function(){ hardReset(); closeConfirm(); });
+    });
+    confirmYes.addEventListener('click', function(){
+      if (typeof confirmCb === 'function'){ var cb = confirmCb; confirmCb = null; closeConfirm(); cb(); }
+    });
+    confirmNo.addEventListener('click', function(){ closeConfirm(); });
+    confirmModal.addEventListener('click', function(e){
+      if (e.target === confirmModal) closeConfirm();
+    });
+
+    /* Escape */
+    document.addEventListener('keydown', function(e){
+      if (e.key !== 'Escape') return;
+      if (!customFieldModal.hidden){ closeCustomFieldModal(); return; }
+      if (!customTypeModal.hidden){ closeCustomTypeModal(); return; }
+      if (!confirmModal.hidden){ closeConfirm(); return; }
+      if (!messengerModal.hidden){ closeMessengerModal(); return; }
+      if (!actionModal.hidden){
+        closeActionModal();
+        pendingShare = { kind:null, text:'', canvas:null, blob:null, filename:'' };
+        return;
+      }
+      if (!exportOverlay.hidden){ closeExport(); return; }
+      if (!overlay.hidden) closeForm(false);
+    });
+
+    /* ویرایش/حذف */
+    $('jobList').addEventListener('click', function(e){
+      var btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      e.preventDefault();
+      var card = btn.closest('.job-card');
+      if (!card) return;
+      var id = card.getAttribute('data-id');
+      var job = getJob(id);
+      if (!job) return;
+      if (btn.getAttribute('data-act') === 'edit'){ openForm(job); }
+      else {
+        if (confirm('این کار حذف شود؟')){
+          state.jobs = state.jobs.filter(function(x){ return x.id !== id; });
+          persistNow(); lastIdsKey = ''; render(); toast('کار حذف شد');
+        }
+      }
+    });
+
+    window.addEventListener('beforeunload', function(e){
+      if (formDirty){ e.preventDefault(); e.returnValue = ''; return ''; }
+    });
+
+    /* Resize برای نمودار */
+    var resizeTimer = null;
+    window.addEventListener('resize', function(){
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function(){
+        resizeTimer = null;
+        if (currentScreenId() === 'analyticsScreen') drawChart();
+      }, 180);
+    });
+  }
+
+  /* ============================================================
+     init
+     ============================================================ */
+  function init(){
+    initTheme();
+    loadAll();
+    ensureOptionalState();
+
+    if (!state.reportDate) state.reportDate = jalaliToFa(todayJalali());
+    if ($('reportDate')) $('reportDate').value = state.reportDate;
+    if ($('carKm')) $('carKm').value = state.carKm;
+    if ($('team')) $('team').value  = state.team;
+
+    bindEvents();
+
+    rebuildAllUIs();
+    renderCustomTypeTiles();
+    markTypeTiles();
+    renderOptionalTiles();
+    renderDynamicFields();
+    applyOptionalState();
+    updateDescVisibility();
+    updateTypeVisibility();
+    renderTagFormUI();
+    render();
+    updateDashboard();
+
+    initCalState();
+    initAnState();
+
+    if (window.location.hash){
+      initFromHash();
+    } else {
+      showScreen('landing', false);
+    }
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+
+})();
+</script>
+</body>
+</html>
